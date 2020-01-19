@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Popular"
+            android:text="My Orders"
             android:textSize="18dp"
             android:background="@drawable/bordersforrelativelayout"/>
         <androidx.cardview.widget.CardView
@@ -97,7 +97,7 @@
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
-    <RelativeLayout
+   <!-- <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
@@ -236,5 +236,5 @@
                     android:layout_alignParentLeft="true"/>
             </RelativeLayout>
         </com.google.android.material.bottomnavigation.BottomNavigationView>
-    </RelativeLayout>
+    </RelativeLayout>-->
 </LinearLayout>

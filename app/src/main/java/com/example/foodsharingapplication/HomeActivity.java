@@ -24,6 +24,7 @@ import com.example.foodsharingapplication.products.ProductsFragment.ProductGridV
 import com.example.foodsharingapplication.products.ProductsFragment.ProductListView;
 import com.example.foodsharingapplication.products.ProductsFragment.UploadDataFragment;
 import com.example.foodsharingapplication.products.UserUploadedFood;
+import com.example.foodsharingapplication.userOrdersAndUploadedAds.UserOrderAndUploads;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -208,6 +209,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             case R.id.signOut:
                 firebaseAuth.signOut();
                 startActivity(new Intent(HomeActivity.this, HomeDefinition.class));
+
+                break;
+            case R.id.myOrders:
+                startActivity(new Intent(HomeActivity.this, UserOrderAndUploads.class));
 
                 break;
             /*case R.id.updateProfile:

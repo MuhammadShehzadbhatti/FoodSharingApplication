@@ -10,8 +10,8 @@ import java.util.Date;
 public class User implements Parcelable {
     private double Latitude;
     private double Longitude;
-    private @ServerTimestamp
-    Date timestamp;
+    private @ServerTimestamp Date timestamp;
+    private UserUploadFoodModel uploadModel;
     private String userId;
     private String userName;
     private String userPhoneNumber;
@@ -64,6 +64,14 @@ public class User implements Parcelable {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public UserUploadFoodModel getUploadModel() {
+        return uploadModel;
+    }
+
+    public void setUploadModel(UserUploadFoodModel uploadModel) {
+        this.uploadModel = uploadModel;
     }
 
     public String getUserCountryCurrency() {

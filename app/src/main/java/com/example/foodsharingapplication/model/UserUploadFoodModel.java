@@ -8,6 +8,9 @@ import java.util.HashMap;
 
 public class UserUploadFoodModel {
 
+
+    public static final String PAYPAL_CLIENT_ID="AVULyNmcckcTupOFuhbixw6Y9-eLfvfFeIWWA-oWTDoDLmYBywtiJTJLsfEcfhklndSEfIVgMv0DXASr";
+
     private String adId;
     private String foodTitle,foodDescription,foodPickUpDetail,foodPrice;
     private String foodType;
@@ -175,4 +178,5 @@ public class UserUploadFoodModel {
     public void setFoodUploadDateAndTime(String foodUploadDateAndTime) {
         this.foodUploadDateAndTime = foodUploadDateAndTime;
     }
+
 }

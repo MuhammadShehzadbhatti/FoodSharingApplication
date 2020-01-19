@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ProductListView extends AppCompatActivity {
@@ -120,7 +121,7 @@ public class ProductListView extends AppCompatActivity {
     // /////////Search View Query and Populating View//////////
     private void firebaseSearch(String searchText) {
         String query = searchText;
-        Query searchQuery = FirebaseDatabase.getInstance().getReference("Seller").child("User").orderByChild("foodTitle").startAt(query).endAt(query + "\uf0ff");
+        Query searchQuery = FirebaseDatabase.getInstance().getReference("Food").child("FoodByAllUsers").orderByChild("foodTitle").startAt(query).endAt(query + "\uf0ff");
 
         FirebaseRecyclerOptions<UserUploadFoodModel> searchOptions =
                 new FirebaseRecyclerOptions.Builder<UserUploadFoodModel>().setQuery(searchQuery, UserUploadFoodModel.class).build();
@@ -150,11 +151,8 @@ public class ProductListView extends AppCompatActivity {
                         String myCuisineType = getItem(position).getFoodTypeCuisine();
                         String pay = getItem(position).getPayment();
                         String available = getItem(position).getAvailabilityDays();
-
-                        // Image setting
-                        //String myImage2 = getItem(position).getImage2();
-                        String myImage = getItem(position).getmImageUri();
-                        HashMap<String, String> hashImage = getItem(position).getHashMap();
+                        String mImageUri = getItem(position).getmImageUri();
+                        ArrayList<String> imageArray = getItem(position).getmArrayString();
 
                         Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
 
@@ -166,13 +164,12 @@ public class ProductListView extends AppCompatActivity {
                         intent.putExtra("cuisineType", myCuisineType);
                         intent.putExtra("pay", pay);
                         intent.putExtra("availability", available);
-
-                        // Image Setting
-                        //intent.putExtra("image2", myImage2);
-                        if (myImage != null) {
-                            intent.putExtra("image", myImage);
-                        } else if (hashImage != null) {
-                            intent.getStringArrayExtra("hashImage");
+                        intent.putExtra("imageArray",imageArray);
+                        if(mImageUri!=null){
+                            intent.putExtra("imageUri", mImageUri);
+                        }
+                        else{
+                            intent.putStringArrayListExtra("imageArray",imageArray);
                         }
 
                         startActivity(intent);
@@ -200,7 +197,7 @@ public class ProductListView extends AppCompatActivity {
 
         // ///////////Query to get Data from Firebase and Populate HomePage///////////
 
-        Query query = FirebaseDatabase.getInstance().getReference("Seller").child("User");
+        Query query = FirebaseDatabase.getInstance().getReference("Food").child("FoodByAllUser");
         FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder> firebaseRecyclerAdapter;
         FirebaseRecyclerOptions<UserUploadFoodModel> options =
                 new FirebaseRecyclerOptions.Builder<UserUploadFoodModel>().setQuery(query, UserUploadFoodModel.class).build();
@@ -215,7 +212,7 @@ public class ProductListView extends AppCompatActivity {
             @NonNull
             @Override
             public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_view, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_grid, parent, false);
 
                 // //////Handle click on the recycler view/////////////
                 ViewHolder viewHolder = new ViewHolder(view);
@@ -231,11 +228,8 @@ public class ProductListView extends AppCompatActivity {
                         String myCuisineType = getItem(position).getFoodTypeCuisine();
                         String pay = getItem(position).getPayment();
                         String available = getItem(position).getAvailabilityDays();
-
-                        // Image setting
-                        //String myImage2 = getItem(position).getImage2();
-                        String myImage = getItem(position).getmImageUri();
-                        HashMap<String, String> hashImage = getItem(position).getHashMap();
+                        String mImageUri = getItem(position).getmImageUri();
+                        ArrayList<String> imageArray = getItem(position).getmArrayString();
 
                         Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
 
@@ -247,13 +241,11 @@ public class ProductListView extends AppCompatActivity {
                         intent.putExtra("cuisineType", myCuisineType);
                         intent.putExtra("pay", pay);
                         intent.putExtra("availability", available);
-
-                        // Image Setting
-                        //intent.putExtra("image2", myImage2);
-                        if (myImage != null) {
-                            intent.putExtra("image", myImage);
-                        } else if (hashImage != null) {
-                            intent.getStringArrayExtra("hashImage");
+                        if(mImageUri!=null){
+                            intent.putExtra("imageUri", mImageUri);
+                        }
+                        else{
+                            intent.putStringArrayListExtra("imageArray",imageArray);
                         }
 
                         startActivity(intent);

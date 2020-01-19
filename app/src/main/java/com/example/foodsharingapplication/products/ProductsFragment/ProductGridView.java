@@ -3,6 +3,7 @@ package com.example.foodsharingapplication.products.ProductsFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,10 +24,12 @@ import com.example.foodsharingapplication.products.ViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -39,8 +42,11 @@ public class ProductGridView extends Fragment {
     RecyclerView myRecyclerView2;
     LinearLayout slider_linear_layout;
     FirebaseDatabase myFirebaseDatabase;
+
     DatabaseReference myRef;
     UserUploadFoodModel userUploadFoodModel;
+    Boolean flag = false;
+    FirebaseAuth firebaseAuth;
 
     public ProductGridView() {
         // Required empty public constructor
@@ -76,6 +82,8 @@ public class ProductGridView extends Fragment {
         // ////////Make it Horizontal/////////////
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
         myRecyclerView.setLayoutManager(layoutManager);
         myRef = FirebaseDatabase.getInstance().getReference();
         //Database Reference
@@ -90,15 +98,28 @@ public class ProductGridView extends Fragment {
     // /////////Search View Query and Populating View//////////
     private void firebaseSearch(String searchText) {
         String query = searchText;
-        Query searchQuery = FirebaseDatabase.getInstance().getReference("Seller").child("User").orderByChild("foodTitle").startAt(query).endAt(query + "\uf0ff");
+        Query searchQuery = FirebaseDatabase.getInstance().getReference("Food").child("FoodByAllUsers").orderByChild("foodTitle").startAt(query).endAt(query + "\uf0ff");
 
         FirebaseRecyclerOptions<UserUploadFoodModel> searchOptions =
                 new FirebaseRecyclerOptions.Builder<UserUploadFoodModel>().setQuery(searchQuery, UserUploadFoodModel.class).build();
 
         FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder>(searchOptions) {
             @Override
-            protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull UserUploadFoodModel model) {
-                holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+            protected void onBindViewHolder(@NonNull ViewHolder holder, final int position, @NonNull UserUploadFoodModel model) {
+                if(model.getmImageUri()!=null) {
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
+                else{
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmArrayString().get(0), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
+                holder.itemView.findViewById(R.id.fav).setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        String adID = getItem(position).getAdId();
+                        favourites_check(adID,v);
+                    }
+                });
             }
 
             @NonNull
@@ -120,11 +141,8 @@ public class ProductGridView extends Fragment {
                         String myCuisineType = getItem(position).getFoodTypeCuisine();
                         String pay = getItem(position).getPayment();
                         String available = getItem(position).getAvailabilityDays();
-
-                        // Image setting
-                        //String myImage2 = getItem(position).getImage2();
-                        String myImage = getItem(position).getmImageUri();
-                        HashMap<String, String> hashImage = getItem(position).getHashMap();
+                        String mImageUri = getItem(position).getmImageUri();
+                        ArrayList<String> imageArray = getItem(position).getmArrayString();
 
                         Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
 
@@ -136,13 +154,11 @@ public class ProductGridView extends Fragment {
                         intent.putExtra("cuisineType", myCuisineType);
                         intent.putExtra("pay", pay);
                         intent.putExtra("availability", available);
-
-                        // Image Setting
-                        //intent.putExtra("image2", myImage2);
-                        if (myImage != null) {
-                            intent.putExtra("image", myImage);
-                        } else if (hashImage != null) {
-                            intent.getStringArrayExtra("hashImage");
+                        if(mImageUri!=null){
+                            intent.putExtra("imageUri", mImageUri);
+                        }
+                        else{
+                            intent.putStringArrayListExtra("imageArray",imageArray);
                         }
 
                         startActivity(intent);
@@ -177,19 +193,29 @@ public class ProductGridView extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        //  //////////// SEARCHING ENDS here//////////
-
-        // //////////////Query and Populating Recycler View 1 ///////////
-
-        Query query = FirebaseDatabase.getInstance().getReference("Seller").child("User");
+        // //////////////Query and Populating Recycler View 1 //////////
+        Query query = FirebaseDatabase.getInstance().getReference("Food").child("FoodByAllUsers");
         FirebaseRecyclerOptions<UserUploadFoodModel> options =
                 new FirebaseRecyclerOptions.Builder<UserUploadFoodModel>().setQuery(query, UserUploadFoodModel.class).build();
 
         FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder>(options) {
 
             @Override
-            protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull UserUploadFoodModel model) {
-                holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+            protected void onBindViewHolder(@NonNull ViewHolder holder, final int position, @NonNull UserUploadFoodModel model) {
+                if(model.getmImageUri()!=null) {
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
+                else{
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmArrayString().get(0), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
+                holder.itemView.findViewById(R.id.fav).setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        String adID = getItem(position).getAdId();
+                        favourites_check(adID,v);
+                    }
+                });
             }
 
             @NonNull
@@ -214,8 +240,8 @@ public class ProductGridView extends Fragment {
                         String myCuisineType = getItem(position).getFoodTypeCuisine();
                         String pay = getItem(position).getPayment();
                         String available = getItem(position).getAvailabilityDays();
-                        HashMap<String, String> hashImage = getItem(position).getHashMap();
-                        //String myImage2 = getItem(position).getImage2();
+                        String mImageUri = getItem(position).getmImageUri();
+                        ArrayList<String> imageArray = getItem(position).getmArrayString();
 
 
                         Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
@@ -228,12 +254,11 @@ public class ProductGridView extends Fragment {
                         intent.putExtra("cuisineType", myCuisineType);
                         intent.putExtra("pay", pay);
                         intent.putExtra("availability", available);
-
-                        //intent.putExtra("image2", myImage2);
-                        if (myImage != null) {
-                            intent.putExtra("image", myImage);
-                        } else if (hashImage != null) {
-                            intent.putExtra("hashImage", hashImage);
+                        if(mImageUri!=null){
+                            intent.putExtra("imageUri", mImageUri);
+                        }
+                        else{
+                            intent.putStringArrayListExtra("imageArray",imageArray);
                         }
 
                         startActivity(intent);
@@ -253,7 +278,7 @@ public class ProductGridView extends Fragment {
 
         // //////////////Query and Populating Slider Recycler View 2 ///////////
 
-        Query query2 = FirebaseDatabase.getInstance().getReference("Seller").child("User");
+        Query query2 = FirebaseDatabase.getInstance().getReference("Food").child("FoodByAllUsers");
         FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder> firebaseRecyclerAdapter2;
         FirebaseRecyclerOptions<UserUploadFoodModel> options2 =
                 new FirebaseRecyclerOptions.Builder<UserUploadFoodModel>().setQuery(query2, UserUploadFoodModel.class).build();
@@ -262,27 +287,18 @@ public class ProductGridView extends Fragment {
 
             @Override
             protected void onBindViewHolder(@NonNull ViewHolder holder, final int position, @NonNull UserUploadFoodModel model) {
-                holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                if(model.getmImageUri()!=null) {
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
+                else{
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmArrayString().get(0), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
                 holder.itemView.findViewById(R.id.fav).setOnClickListener(new View.OnClickListener() {
-
-                    String title = getItem(position).getFoodTitle();
-                    Query q = FirebaseDatabase.getInstance().getReference("Seller").child("User").orderByChild("foodTitle");
-                    Query favorites = q.equalTo(title);
 
                     @Override
                     public void onClick(View v) {
-                        //UserUploadFoodModel userUploadFoodModel;
-                        if (favorites == null) {
-
-                        }
-                        Toast toast = Toast.makeText(getContext(),
-                                "This is a message displayed in a Toast",
-                                Toast.LENGTH_SHORT);
-                        toast.show();
-
-                        ImageButton favImage = v.findViewById(R.id.fav);
-                        favImage.getId();
-                        favImage.setImageResource(R.drawable.ic_favorite_black_24dp);
+                        String adID = getItem(position).getAdId();
+                        favourites_check(adID,v);
                     }
                 });
 
@@ -309,8 +325,8 @@ public class ProductGridView extends Fragment {
                         String myCuisineType = getItem(position).getFoodTypeCuisine();
                         String pay = getItem(position).getPayment();
                         String available = getItem(position).getAvailabilityDays();
-                        HashMap<String, String> hashImage = getItem(position).getHashMap();
-                        //String myImage2 = getItem(position).getImage2();
+                        String mImageUri = getItem(position).getmImageUri();
+                        ArrayList<String> imageArray = getItem(position).getmArrayString();
 
 
                         Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
@@ -323,13 +339,13 @@ public class ProductGridView extends Fragment {
                         intent.putExtra("cuisineType", myCuisineType);
                         intent.putExtra("pay", pay);
                         intent.putExtra("availability", available);
-
-                        //intent.putExtra("image2", myImage2);
-                        if (myImage != null) {
-                            intent.putExtra("image", myImage);
-                        } else if (hashImage != null) {
-                            intent.putExtra("hashImage", hashImage);
+                        if(mImageUri!=null){
+                            intent.putExtra("imageUri", mImageUri);
                         }
+                        else{
+                            intent.putStringArrayListExtra("imageArray",imageArray);
+                        }
+
 
                         startActivity(intent);
 
@@ -337,10 +353,6 @@ public class ProductGridView extends Fragment {
 
                     @Override
                     public void onItemLongClick(View view, int position) {
-                        Toast toast = Toast.makeText(getContext(),
-                                "This is a message displayed in a Toast",
-                                Toast.LENGTH_SHORT);
-                        toast.show();
                     }
                 });
 
@@ -353,5 +365,29 @@ public class ProductGridView extends Fragment {
         myRecyclerView2.setAdapter(firebaseRecyclerAdapter2);
     }
 
+    public void favourites_check(String adID, View v){
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        final DatabaseReference favorites = FirebaseDatabase.getInstance().getReference().child("favorites");
+        ImageButton favImage = v.findViewById(R.id.fav);
+
+        UserUploadFoodModel objFav = new UserUploadFoodModel();
+        objFav.setAdId(adID);
+        String userID = firebaseAuth.getCurrentUser().getUid();
+        Query userIsInFav = favorites.orderByKey().equalTo(userID);
+        Query adIsInFav = favorites.child(userID).orderByKey().equalTo(adID);
+
+
+        if(userIsInFav!= null){
+            favorites.child(userID).child(adID).setValue(objFav);
+            favImage.setImageResource(R.drawable.ic_favorite_black_24dp);
+            Toast.makeText(getContext(),"Is already in fav", Toast.LENGTH_SHORT).show();
+
+        }
+        else if (userIsInFav==null){
+            favorites.child(userID).child(adID).setValue(objFav);
+            favImage.setImageResource(R.drawable.ic_favorite_black_24dp);
+            Toast.makeText(getContext(),"Added to Favorites", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

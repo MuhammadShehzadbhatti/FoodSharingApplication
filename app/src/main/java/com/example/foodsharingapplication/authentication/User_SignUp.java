@@ -207,7 +207,8 @@ public class User_SignUp extends AppCompatActivity {
 
         }
         try {
-            firebaseAuth.createUserWithEmailAndPassword(txtUser_Email.getText().toString(), txtUser_Password.getText().toString().trim())
+            firebaseAuth.createUserWithEmailAndPassword(txtUser_Email.getText().toString(), txtUser_Password.getText().toString().trim());
+            firebaseAuth.createUserWithEmailAndPassword(userEmail, userPassword)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -234,6 +235,7 @@ public class User_SignUp extends AppCompatActivity {
                                                                     }
                                                                 }
                                                             });
+                                                    startActivity(new Intent(User_SignUp.this, HomeDefinition.class));
                                                 }
                                             }
                                         });
@@ -243,7 +245,7 @@ public class User_SignUp extends AppCompatActivity {
                             }*/
                             } else {
                                 //do on failure
-                                Toast.makeText(User_SignUp.this, "Email Already Exists123", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(User_SignUp.this, "Email Already Exists", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

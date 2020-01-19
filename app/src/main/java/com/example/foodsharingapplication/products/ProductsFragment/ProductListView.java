@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -89,7 +90,12 @@ public class ProductListView extends Fragment {
         FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder>(searchOptions) {
             @Override
             protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull UserUploadFoodModel model) {
-                holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                if(model.getmImageUri()!=null) {
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
+                else{
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmArrayString().get(0), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
             }
 
             @NonNull
@@ -111,11 +117,8 @@ public class ProductListView extends Fragment {
                         String myCuisineType = getItem(position).getFoodTypeCuisine();
                         String pay = getItem(position).getPayment();
                         String available = getItem(position).getAvailabilityDays();
-
-                        // Image setting
-                        //String myImage2 = getItem(position).getImage2();
-                        String myImage = getItem(position).getmImageUri();
-                        HashMap<String, String> hashImage = getItem(position).getHashMap();
+                        String mImageUri = getItem(position).getmImageUri();
+                        ArrayList<String> imageArray = getItem(position).getmArrayString();
 
                         Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
 
@@ -127,13 +130,11 @@ public class ProductListView extends Fragment {
                         intent.putExtra("cuisineType", myCuisineType);
                         intent.putExtra("pay", pay);
                         intent.putExtra("availability", available);
-
-                        // Image Setting
-                        //intent.putExtra("image2", myImage2);
-                        if (myImage != null) {
-                            intent.putExtra("image", myImage);
-                        } else if (hashImage != null) {
-                            intent.getStringArrayExtra("hashImage");
+                        if(mImageUri!=null){
+                            intent.putExtra("imageUri", mImageUri);
+                        }
+                        else{
+                            intent.putStringArrayListExtra("imageArray",imageArray);
                         }
 
                         startActivity(intent);
@@ -165,12 +166,16 @@ public class ProductListView extends Fragment {
         FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder> firebaseRecyclerAdapter;
         FirebaseRecyclerOptions<UserUploadFoodModel> options =
                 new FirebaseRecyclerOptions.Builder<UserUploadFoodModel>().setQuery(query, UserUploadFoodModel.class).build();
-
         firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder>(options) {
 
             @Override
             protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull UserUploadFoodModel model) {
-                holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                if(model.getmImageUri()!=null) {
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
+                else{
+                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmArrayString().get(0), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
             }
 
             @NonNull
@@ -192,11 +197,8 @@ public class ProductListView extends Fragment {
                         String myCuisineType = getItem(position).getFoodTypeCuisine();
                         String pay = getItem(position).getPayment();
                         String available = getItem(position).getAvailabilityDays();
-
-                        // Image setting
-                        //String myImage2 = getItem(position).getImage2();
-                        String myImage = getItem(position).getmImageUri();
-                        HashMap<String, String> hashImage = getItem(position).getHashMap();
+                        String mImageUri = getItem(position).getmImageUri();
+                        ArrayList<String> imageArray = getItem(position).getmArrayString();
 
                         Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
 
@@ -208,13 +210,11 @@ public class ProductListView extends Fragment {
                         intent.putExtra("cuisineType", myCuisineType);
                         intent.putExtra("pay", pay);
                         intent.putExtra("availability", available);
-
-                        // Image Setting
-                        //intent.putExtra("image2", myImage2);
-                        if (myImage != null) {
-                            intent.putExtra("image", myImage);
-                        } else if (hashImage != null) {
-                            intent.getStringArrayExtra("hashImage");
+                        if(mImageUri!=null){
+                            intent.putExtra("imageUri", mImageUri);
+                        }
+                        else{
+                            intent.putStringArrayListExtra("imageArray",imageArray);
                         }
 
                         startActivity(intent);
