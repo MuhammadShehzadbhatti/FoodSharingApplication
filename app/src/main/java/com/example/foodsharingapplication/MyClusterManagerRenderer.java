@@ -14,6 +14,7 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
+import com.squareup.picasso.Picasso;
 
 
 public class MyClusterManagerRenderer extends DefaultClusterRenderer<ClusterMarker>
@@ -38,7 +39,6 @@ public class MyClusterManagerRenderer extends DefaultClusterRenderer<ClusterMark
         int padding = (int) context.getResources().getDimension(R.dimen.custom_marker_padding);
         imageView.setPadding(padding, padding, padding, padding);
         iconGenerator.setContentView(imageView);
-
     }
 
     /**
@@ -48,10 +48,10 @@ public class MyClusterManagerRenderer extends DefaultClusterRenderer<ClusterMark
      */
     @Override
     protected void onBeforeClusterItemRendered(ClusterMarker item, MarkerOptions markerOptions) {
+        Picasso.get().load(item.getIconPicture()).into(imageView);
 
-        imageView.setImageResource(item.getIconPicture());
         Bitmap icon = iconGenerator.makeIcon();
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(item.getTitle());
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).snippet(item.getTitle());
     }
 
 

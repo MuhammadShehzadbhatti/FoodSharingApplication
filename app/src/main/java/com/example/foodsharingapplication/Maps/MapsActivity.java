@@ -1,6 +1,7 @@
 package com.example.foodsharingapplication.Maps;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 //import android.support.v7.app.AppCompatActivity;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +31,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.room.Database;
 
+import com.example.foodsharingapplication.Dashboard;
+import com.example.foodsharingapplication.authentication.ShowData;
+import com.example.foodsharingapplication.extras.showproducts;
 import com.example.foodsharingapplication.model.ClusterMarker;
+import com.example.foodsharingapplication.products.PostDetailActivity;
 import com.google.maps.android.clustering.ClusterManager;
 import com.squareup.picasso.Picasso;
 
@@ -154,6 +160,7 @@ public class MapsActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         Userloc.clear();
         distances.clear();
+
 
         super.onCreate(savedInstanceState);
         myRef.setValue("Hello, World!");
@@ -313,7 +320,6 @@ public class MapsActivity extends AppCompatActivity
 
                                     }
                                     Log.e(TAG,"distances size= "+Userloc.size());
-                                    resetMap();
 
                                     PointerPlacer(curr,distances,progress1,Userloc);
                                 }
@@ -356,7 +362,7 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
-    private void PointerPlacer(LatLng curr, ArrayList<Double> distances, int progress1, ArrayList<UserUploadFoodModel> userloc) {
+    private void PointerPlacer(LatLng curr, ArrayList<Double> distances, int progress1, final ArrayList<UserUploadFoodModel> userloc) {
         resetMap();
 
         //removeTripMarkers();
@@ -364,6 +370,7 @@ public class MapsActivity extends AppCompatActivity
         if(mClusterManager == null){
            mClusterManager = new ClusterManager<ClusterMarker>(this.getApplicationContext(), mMap);
         }
+
 
         if(mClusterManagerRenderer == null){
             mClusterManagerRenderer = new MyClusterManagerRenderer(
@@ -373,6 +380,36 @@ public class MapsActivity extends AppCompatActivity
             );
             mClusterManager.setRenderer(mClusterManagerRenderer);
         }
+        //{
+//            Intent intent=new Intent(MapsActivity.this, showproducts.class);
+//
+
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+
+            public void onInfoWindowClick(Marker marker) {
+                Log.e(TAG, "onInfoWindowClicnnnk: "+marker.getTitle() );
+                Intent intent = new Intent(MapsActivity.this, PostDetailActivity.class);
+                for(int z=0;z < userloc.size();z++){
+                    Log.e(TAG, "onInfoWindowClick: "+userloc.get(z).getFoodTitle());
+                    if(userloc.get(z).getFoodTitle().equals(marker.getTitle())) {
+                        Log.e(TAG, "here ");
+
+                        intent.putExtra("ad_id", userloc.get(z).getAdId());
+                        intent.putExtra("title", userloc.get(z).getFoodTitle());
+                        intent.putExtra("description", userloc.get(z).getFoodDescription());
+                        intent.putExtra("price", userloc.get(z).getFoodPrice());
+                        intent.putExtra("time", userloc.get(z).getFoodUploadDateAndTime());
+                        intent.putExtra("type", userloc.get(z).getFoodType());
+                        intent.putExtra("cuisineType", userloc.get(z).getFoodTypeCuisine());
+                        intent.putExtra("pay", userloc.get(z).getFoodPrice());
+                        intent.putExtra("availability", userloc.get(z).getAvailabilityDays());
+                        intent.putExtra("foodPostedBy", userloc.get(z).getFoodPostedBy());
+                        startActivity(intent);
+                        break;
+                    }
+                }
+            } });
         String snippet="descript" ;
         int avatar = R.drawable.veganfood; // set the default avatar
 
@@ -380,21 +417,17 @@ public class MapsActivity extends AppCompatActivity
 
 
         if (progress1==1000) {
-           // removeTripMarkers();
+           //removeTripMarkers();
             for (int i = 0; i < userloc.size(); i++){
                 if (distances.get(i)<1000 ){
                     ClusterMarker newClusterMarker = new ClusterMarker(
                             new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
                             userloc.get(i).getUser().getUserName(),
-                            snippet,
-                            avatar,
+                            userloc.get(i).getFoodTitle(),
+                            userloc.get(i).getmImageUri(),
                             userloc.get(i).getUser()
                     );
-                    circle1 = mMap.addCircle(circle
-                            .center(new LatLng(curr.latitude,curr.longitude))
-                            .radius(progress1)
-                            .strokeWidth(5f)
-                            .fillColor(0x515000FF));
+
 
 
                     mClusterManager.addItem(newClusterMarker);
@@ -405,6 +438,11 @@ public class MapsActivity extends AppCompatActivity
 
 
             }
+            circle1 = mMap.addCircle(circle
+                    .center(new LatLng(curr.latitude,curr.longitude))
+                    .radius(progress1)
+                    .strokeWidth(5f)
+                    .fillColor(0x515000FF));
 
             mClusterManager.cluster();
 
@@ -416,15 +454,11 @@ public class MapsActivity extends AppCompatActivity
                     ClusterMarker newClusterMarker = new ClusterMarker(
                             new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
                             userloc.get(i).getUser().getUserName(),
-                            snippet,
-                            avatar,
+                            userloc.get(i).getFoodTitle(),
+                            userloc.get(i).getmImageUri(),
                             userloc.get(i).getUser()
                     );
-                    circle1 = mMap.addCircle(circle
-                            .center(new LatLng(curr.latitude,curr.longitude))
-                            .radius(progress1)
-                            .strokeWidth(5f)
-                            .fillColor(0x515000FF));
+
 
 
                     mClusterManager.addItem(newClusterMarker);
@@ -436,6 +470,11 @@ public class MapsActivity extends AppCompatActivity
 
 
             }
+            circle1 = mMap.addCircle(circle
+                    .center(new LatLng(curr.latitude,curr.longitude))
+                    .radius(progress1)
+                    .strokeWidth(5f)
+                    .fillColor(0x515000FF));
             mClusterManager.cluster();
 
 
@@ -446,15 +485,11 @@ public class MapsActivity extends AppCompatActivity
                     ClusterMarker newClusterMarker = new ClusterMarker(
                             new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
                             userloc.get(i).getUser().getUserName(),
-                            snippet,
-                            avatar,
+                            userloc.get(i).getFoodTitle(),
+                            userloc.get(i).getmImageUri(),
                             userloc.get(i).getUser()
                     );
-                    circle1 = mMap.addCircle(circle
-                            .center(new LatLng(curr.latitude,curr.longitude))
-                            .radius(progress1)
-                            .strokeWidth(5f)
-                            .fillColor(0x515000FF));
+
 
 
                     mClusterManager.addItem(newClusterMarker);
@@ -467,6 +502,11 @@ public class MapsActivity extends AppCompatActivity
 
             }
             mClusterManager.cluster();
+            circle1 = mMap.addCircle(circle
+                    .center(new LatLng(curr.latitude,curr.longitude))
+                    .radius(progress1)
+                    .strokeWidth(5f)
+                    .fillColor(0x515000FF));
 
 
         }
@@ -476,15 +516,11 @@ public class MapsActivity extends AppCompatActivity
                     ClusterMarker newClusterMarker = new ClusterMarker(
                             new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
                             userloc.get(i).getUser().getUserName(),
-                            snippet,
-                            avatar,
+                            userloc.get(i).getFoodTitle(),
+                            userloc.get(i).getmImageUri(),
                             userloc.get(i).getUser()
                     );
-                    circle1 = mMap.addCircle(circle
-                            .center(new LatLng(curr.latitude,curr.longitude))
-                            .radius(progress1)
-                            .strokeWidth(5f)
-                            .fillColor(0x515000FF));
+
 
 
                     mClusterManager.addItem(newClusterMarker);
@@ -496,6 +532,11 @@ public class MapsActivity extends AppCompatActivity
 
 
             }
+            circle1 = mMap.addCircle(circle
+                    .center(new LatLng(curr.latitude,curr.longitude))
+                    .radius(progress1)
+                    .strokeWidth(5f)
+                    .fillColor(0x515000FF));
             mClusterManager.cluster();
 
 
@@ -506,15 +547,11 @@ public class MapsActivity extends AppCompatActivity
                     ClusterMarker newClusterMarker = new ClusterMarker(
                             new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
                             userloc.get(i).getUser().getUserName(),
-                            snippet,
-                            avatar,
+                            userloc.get(i).getFoodTitle(),
+                            userloc.get(i).getmImageUri(),
                             userloc.get(i).getUser()
                     );
-                    circle1 = mMap.addCircle(circle
-                            .center(new LatLng(curr.latitude,curr.longitude))
-                            .radius(progress1)
-                            .strokeWidth(5f)
-                            .fillColor(0x515000FF));
+
 
 
                     mClusterManager.addItem(newClusterMarker);
@@ -526,6 +563,11 @@ public class MapsActivity extends AppCompatActivity
 
 
             }
+            circle1 = mMap.addCircle(circle
+                    .center(new LatLng(curr.latitude,curr.longitude))
+                    .radius(progress1)
+                    .strokeWidth(5f)
+                    .fillColor(0x515000FF));
             mClusterManager.cluster();
 
 
@@ -827,6 +869,8 @@ public class MapsActivity extends AppCompatActivity
 
         }
     }
+
+
 
 
 }
