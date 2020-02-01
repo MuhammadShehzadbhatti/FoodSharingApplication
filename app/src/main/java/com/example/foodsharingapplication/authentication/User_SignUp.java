@@ -116,24 +116,20 @@ public class User_SignUp extends AppCompatActivity {
 
     private void checkEmailDialogue() {
         //Uncomment the below code to Set the message and title from the strings.xml file
-        builder.setMessage("Please Check Your email") .setTitle("Email Verification ");
+        builder.setMessage("Check Your email") .setTitle("Email Verification ");
 
         //Setting message manually and performing action on button click
-        builder.setMessage("Do you want to close this application ?")
+        builder.setMessage("You received an email please click on the attacked link to verify the email address ")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         finish();
-                        Toast.makeText(getApplicationContext(),"you choose yes action for alertbox",
-                                Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //  Action for 'NO' Button
                         dialog.cancel();
-                        Toast.makeText(getApplicationContext(),"you choose no action for alertbox",
-                                Toast.LENGTH_SHORT).show();
                     }
                 });
         //Creating dialog box
