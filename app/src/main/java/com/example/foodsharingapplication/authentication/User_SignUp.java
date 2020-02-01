@@ -123,6 +123,7 @@ public class User_SignUp extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(getApplicationContext(),SignIn.class));
                         finish();
                     }
                 })
@@ -135,7 +136,7 @@ public class User_SignUp extends AppCompatActivity {
         //Creating dialog box
         AlertDialog alert = builder.create();
         //Setting the title manually
-        alert.setTitle("AlertDialogExample");
+        alert.setTitle("Email Verification Alert:");
         alert.show();
     }
 
