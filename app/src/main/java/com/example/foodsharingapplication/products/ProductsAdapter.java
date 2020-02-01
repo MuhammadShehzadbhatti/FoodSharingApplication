@@ -12,16 +12,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodsharingapplication.R;
-
+import com.example.foodsharingapplication.extras.AllProducts;
+import com.example.foodsharingapplication.extras.Products;
+import com.example.foodsharingapplication.extras.productdetails;
+import com.example.foodsharingapplication.model.UserUploadFoodModel;
 import com.example.foodsharingapplication.model.UserUploadFoodModel;
 import com.example.foodsharingapplication.userOrdersAndUploadedAds.UserOrderAndUploads;
-
+import com.google.firebase.firestore.auth.User;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ProductsViewHolder> {
     private Context mContext;
     private List<UserUploadFoodModel> productsList;
+    private View.OnClickListener listener;
 
     Intent intent ;
     public ProductsAdapter(Context context, List<UserUploadFoodModel> products) {
@@ -34,7 +39,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
     @NonNull
     @Override
     public ProductsAdapter.ProductsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.activity_showproducts, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.single_grid, parent, false);
         return new ProductsAdapter.ProductsViewHolder(view);
     }
 
@@ -61,7 +66,10 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
             holder.productPrice.setText(String.valueOf(productPrice));
             intent.putExtra("pPrice", productPrice);
 
-        if (holder.productName != null) {
+        holder.itemView.setTag(products);
+        holder.itemView.setOnClickListener(listener);
+
+        /*if (holder.productName != null) {
             holder.productName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -70,9 +78,14 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
                     v.getContext().startActivity(intent);
                 }
             });
-        }
+        }*/
 
     }
+
+    public void setOnClickListener(View.OnClickListener listener) {
+        this.listener = listener;
+    }
+
 
     @Override
     public int getItemCount() {
@@ -91,8 +104,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.Produc
         public ProductsViewHolder(@NonNull View itemView) {
             super(itemView);
             productImages = itemView.findViewById(R.id.productImages);
-            productName = itemView.findViewById(R.id.productTitle);
-            productPrice = itemView.findViewById(R.id.productPrice);
+            productName = itemView.findViewById(R.id.textTitle);
+            productPrice = itemView.findViewById(R.id.textPrice);
             // productLocation = itemView.findViewById(R.id.productLocation);
         }
     }

@@ -34,7 +34,7 @@ public class productdetails extends AppCompatActivity {
     private ImageView foodImagesView;
 
     private Button btnPayNow;
-    private int PAYPAL_REQ_CODE=5;
+    private static final int PAYPAL_REQ_CODE=5;
     private static PayPalConfiguration payPalConfiguration=new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
             .clientId(Products.PAYPAL_CLIENT_ID);
     @Override

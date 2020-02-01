@@ -31,7 +31,7 @@ public class AllProducts extends RecyclerView.Adapter<AllProducts.ProductsViewHo
     @NonNull
     @Override
     public AllProducts.ProductsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.activity_showproducts, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.single_grid, parent, false);
         return new ProductsViewHolder(view);
     }
 

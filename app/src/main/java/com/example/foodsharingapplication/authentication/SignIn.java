@@ -113,24 +113,6 @@ public class SignIn extends AppCompatActivity {
         //database reference pointing to User node
         refToPointNode = firebaseRef.child("User").child(id);
         firebaseAuth = FirebaseAuth.getInstance();
-        //btnProfile.setVisibility(View.GONE);
-        /*if (!firebaseAuth.getCurrentUser().getUid().equals("")){
-            btnProfile.setVisibility(View.VISIBLE);
-        }*/
-
-        //if (firebaseAuth.getCurrentUser() == null) {
-
-            /*FacebookSdk.sdkInitialize(this.getApplicationContext());
-            FacebookButton = (LoginButton) findViewById(R.id.fb_login_button);
-            callBackManager = CallbackManager.Factory.create();
-            FacebookButton.setReadPermissions(Arrays.asList("email", "public_profile"));
-            //FacebookButton.setReadPermissions(permissionNeeds);*/
-
-
-       // }
-
-        //btnSignIn.setOnClickListener(this);
-
 
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,34 +127,25 @@ public class SignIn extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        editor.putString("loginEmail",loginEmail);
-                                        editor.putString("loginPassword",loginPassword);
-                                        editor.commit();
-                                        Intent intent = new Intent(SignIn.this, HomeActivity.class);
-                                        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
-                                        //finish();
-                                        Toast.makeText(SignIn.this, "Congrats!231", Toast.LENGTH_SHORT).show();
+                                        if (firebaseAuth.getCurrentUser().isEmailVerified()){
+                                            startActivity(new Intent(SignIn.this, HomeActivity.class));
+                                            finish();
+                                        }
+                                        else{
+                                            email.setError("Email is unverified");
+                                            email.requestFocus();
+                                        }
                                     } else {
                                         Toast.makeText(SignIn.this, "Please check Email or Password", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
-                    /*fragTrans.add(R.id.fragment_container,showData_fragment);
-                    fragTrans.commit();*/
 
                 } else {
                     Toast.makeText(SignIn.this, "Please enter valid Credentials", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-       /* btnProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SignIn.this,ShowData.class);
-                startActivity(intent);
-            }
-        });*/
 
 
 
@@ -182,191 +155,18 @@ public class SignIn extends AppCompatActivity {
                 Toast.makeText(SignIn.this, "Signing Out...", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(SignIn.this, User_SignUp.class);
                 startActivity(intent);
+                finish();
             }
         });
     }
     @Override
     public void onStart() {
         super.onStart();
-        //firebaseAuth.addAuthStateListener(firebaseAuthListener);
         if (firebaseAuth.getCurrentUser()!=null){
             Intent intent = new Intent(SignIn.this, HomeActivity.class);
-            //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+            finish();
         }
     }
-
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        if (firebaseAuthListener != null) {
-//            firebaseAuth.removeAuthStateListener(firebaseAuthListener);
-//        }
-//    }
-
-
-   /* @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnCancel:
-                startActivity(new Intent(this, Dashboard.class));
-                break;
-        }*/
-        /*switch (v.getId()){
-            case R.id.btnLogin:
-                logIn();
-                break;
-        }*/
-    //}
-    /*AccessTokenTracker tokenTracker = new AccessTokenTracker() {
-        @Override
-        protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-
-            if (currentAccessToken == null){
-
-                fbAge="";
-                fbCountry="";
-                fbEmail="";
-                fbImageUrl="";
-                fbid="";
-                fbName="";
-                fbphoneNumber="";
-                Toast.makeText(SignIn.this,"User successfully logged out from Facebook",Toast.LENGTH_SHORT).show();
-            }
-            else{
-
-                loadUserProfile(currentAccessToken);
-
-            }
-
-        }
-    };*/
-
-    /*private void loadUserProfile(AccessToken newAccessToken){
-            final GraphRequest request= GraphRequest.newMeRequest(newAccessToken, new GraphRequest.GraphJSONObjectCallback() {
-                @Override
-                public void onCompleted(JSONObject object, GraphResponse response) {
-                    try {
-                        fbName= object.getString("first_name");
-                        fbEmail=object.getString("email");
-                        fbid=object.getString("id");
-                        fbCountry=object.getString("location");
-                        fbAge=object.getString("age");
-                        fbphoneNumber=object.getString("phone Number");
-                        fbImageUrl="https://graphfacebook.com/"+fbid+"/picture?type=normal";
-
-                        Log.i(" FB Name : ",fbName);
-                        Log.i(" FB Email : ",fbEmail);
-                        Log.i(" FB ID : ",fbid);
-                        Log.i(" FB Country : ",fbCountry);
-                        Log.i(" FB Phone Number : ",fbphoneNumber);
-                        Log.i(" FB Image Url : ",fbImageUrl);
-                        Log.i(" FB Age : ",fbAge);
-                        //txtFbEmail.setText(fbEmail);
-                        //txtFbName.setText(fbEmail);
-                        RequestOptions requestOptions = new RequestOptions();
-                        requestOptions.dontAnimate();
-
-                        Glide.with(SignIn.this).load(fbImageUrl).into(circleImageView);
-                    }
-                    catch (JSONException e){
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-            Bundle parameters= new Bundle();
-            parameters.putString("fields","name,email,id,location,phoneNumber,age,country");
-            request.setParameters(parameters);
-            request.executeAsync();
-        }*/
-
-    /*public void buttonClickLoginFb(View view) {
-        if (firebaseAuth==null) {
-            LoginManager.getInstance().registerCallback(callBackManager, new FacebookCallback<LoginResult>() {
-                @Override
-                public void onSuccess(LoginResult loginResult) {
-
-                    checkLoginStatus(loginResult.getAccessToken());
-
-                }
-
-                @Override
-                public void onCancel() {
-
-                    Toast.makeText(getApplicationContext(), "User cancelled login plan", Toast.LENGTH_SHORT).show();
-
-                }
-
-                @Override
-                public void onError(FacebookException error) {
-
-                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-
-                }
-            });
-        }
-        else {
-            LoginManager.getInstance().logOut();
-        }
-
-    }
-
-    private void checkLoginStatus(AccessToken accessToken) {
-        AuthCredential authCredential = FacebookAuthProvider.getCredential(accessToken.getToken());
-        firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-
-                    FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                    getUserFbInformation(firebaseUser);
-
-                } else {
-
-                    LoginManager.getInstance().logOut();
-                    Toast.makeText(getApplicationContext(), "Could not authenticate user", Toast.LENGTH_SHORT).show();
-
-                }
-            }
-        });
-       *//* if(accessToken.getToken())
-        {
-            loadUserProfile(AccessToken.getCurrentAccessToken());
-        }*//*
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        callBackManager.onActivityResult(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
-    }*/
-
-    /*private void getUserFbInformation(FirebaseUser firebaseUser) {
-
-        Log.i("", firebaseUser.getEmail());
-        Log.i("", firebaseUser.getDisplayName());
-        Log.i("", firebaseUser.getPhotoUrl().toString());
-        User userData=new User();
-        userData.setUserName(firebaseUser.getDisplayName());
-        userData.setUserEmail(firebaseUser.getEmail());
-        userData.setUserProfilePicUrl(firebaseUser.getPhotoUrl().toString());
-        userData.setUserWithFb(Boolean.TRUE);
-        String userDbKey=firebaseRef.push().getKey();
-        firebaseRef.child(firebaseAuth.getCurrentUser().getUid()).setValue(userData).addOnCompleteListener(
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(getApplicationContext()," Successfully Registered with FaceBook ",Toast.LENGTH_SHORT).show();
-                       // Intent intent=new Intent(SignIn.this,ShowData.class);
-                    }
-                });
-*//*        intent.putExtra("fbUserName",firebaseUser.getDisplayName());
-        intent.putExtra("fbUserEmail",firebaseUser.getEmail());
-        intent.putExtra("fbUserPrfileImgUrl",firebaseUser.getPhotoUrl().toString());*//*
-        //Log.i("", firebaseUser.getPhoneNumber());
-        //Log.i("",firebaseUser.getMetadata());
-
-    }*/
 
 }

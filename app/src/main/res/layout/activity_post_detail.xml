@@ -15,20 +15,26 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:id="@+id/linLayout_id"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
         <ViewFlipper
             android:id="@+id/viewFlipper"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:background="@color/colorImageViewBackground"
             android:layout_height="300dp">
 
+
         </ViewFlipper>
+        <View
+            android:id="@+id/SplitLine_hor7"
+            android:layout_width="match_parent"
+            android:layout_height= "3dp"
+            android:background="@color/colorAdText" />
 
 
-            <LinearLayout
+
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1.5"
@@ -47,8 +53,9 @@
                         android:text="Title"
                         android:textStyle="bold"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginBottom="9dp"
-                        android:textSize="25dp" />
+                        android:layout_marginTop="9dp"
+                        android:textSize="25dp"
+                        android:textColor="@color/colorAdText"/>
 
                     <TextView
                         android:id="@+id/pricePost"
@@ -56,16 +63,24 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_marginRight="15dp"
-                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
                         android:gravity="right|top"
                         android:text="Price"
                         android:textColor="@color/priceColor"
                         android:textSize="20dp" />
 
                 </LinearLayout>
+            <View
+                android:id="@+id/SplitLine_hor"
+                android:layout_width="match_parent"
+                android:layout_height= "3dp"
+                android:background="@color/colorAdText" />
 
 
-                <TextView
+
+
+
+            <TextView
                     android:id="@+id/descPost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -73,26 +88,48 @@
                     android:layout_marginBottom="9dp"
                     android:textSize="17dp"
                     android:textStyle="italic"
-                    android:text="Description"/>
+                    android:text="Description"
+                android:textColor="@color/colorAdText"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Food Details"
+                android:textStyle="bold"
+                android:textColor="@color/colorAdText"
+                android:textSize="20dp"
+                android:layout_marginLeft="15dp"/>
+            <View
+                android:id="@+id/SplitLine_hor1"
+                android:layout_width="match_parent"
+                android:layout_height= "3dp"
+                android:background="@color/colorAdText" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pickup Time"
-                        android:textStyle="italic"
+                        android:text="Pickup Time : "
                         android:textSize="20dp"
-                        android:layout_marginLeft="15dp"/>
+                        android:textColor="@color/colorAdText"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="9dp"/>
                     <TextView
                         android:id="@+id/timePost"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/colorAdText"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
                         android:textSize="20dp"
                         android:text="Pick up Time"/>
                 </LinearLayout>
+            <View
+                android:id="@+id/SplitLine_hor2"
+                android:layout_width="match_parent"
+                android:layout_height= "1dp"
+                android:background="@color/colorAdText"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -100,19 +137,26 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Food Type"
-                        android:textStyle="italic"
+                        android:text="Food Type : "
+                        android:textColor="@color/colorAdText"
                         android:textSize="20dp"
-                        android:layout_marginLeft="15dp"/>
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="9dp"/>
                     <TextView
                         android:id="@+id/typePost"
                         android:layout_width="wrap_content"
+                        android:textColor="@color/colorAdText"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
                         android:textSize="20dp"
                         android:text="Food Type"/>
                 </LinearLayout>
+            <View
+                android:id="@+id/SplitLine_hor3"
+                android:layout_width="match_parent"
+                android:layout_height= "1dp"
+                android:background="@color/colorAdText" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -121,22 +165,29 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Availability Details"
-                        android:textStyle="italic"
+                        android:text="Availability Details : "
+                        android:textColor="@color/colorAdText"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
                         android:textSize="20dp" />
 
                     <TextView
                         android:id="@+id/availability"
                         android:layout_width="wrap_content"
+                        android:textColor="@color/colorAdText"
                         android:layout_height="wrap_content"
                         android:text="Availability"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
                         android:textSize="20dp" />
 
                 </LinearLayout>
+            <View
+                android:id="@+id/SplitLine_hor4"
+                android:layout_width="match_parent"
+                android:layout_height= "1dp"
+                android:background="@color/colorAdText"/>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -144,20 +195,26 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textStyle="italic"
+                        android:textColor="@color/colorAdText"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
                         android:textSize="20dp"
-                        android:text="Cuisine Type"/>
+                        android:text="Cuisine Type : "/>
                     <TextView
                         android:id="@+id/cuisineTypePost"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginBottom="9dp"
+                        android:layout_marginTop="9dp"
                         android:textSize="20dp"
+                        android:textColor="@color/colorAdText"
                         android:text="Cuisine Type"/>
                 </LinearLayout>
+            <View
+                android:id="@+id/SplitLine_hor5"
+                android:layout_width="match_parent"
+                android:layout_height= "0.5dp"
+                android:background="@color/colorAdText" />
 
 
                 <LinearLayout
@@ -168,47 +225,51 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginBottom="9dp"
-                        android:textStyle="italic"
+                        android:layout_marginTop="9dp"
+                        android:textColor="@color/colorAdText"
                         android:textSize="20dp"
-                        android:text="Payment Method"/>
+                        android:text="Payment Method : "/>
 
                     <TextView
                         android:id="@+id/paymentPost"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginBottom="9dp"
+                        android:textColor="@color/colorAdText"
+                        android:layout_marginTop="9dp"
                         android:textSize="20dp"
                         android:text="Payment Method"/>
                 </LinearLayout>
+            <View
+                android:id="@+id/SplitLine_hor6"
+                android:layout_width="match_parent"
+                android:layout_height= "1dp"
+                android:background="@color/colorAdText" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginBottom="9dp"
-                    android:textSize="20dp"
-                    android:text="Get Directions"
-                    android:textStyle="italic"
-                    android:textColor="@color/blueColor"/>
 
 
                 <LinearLayout
+                    android:id="@+id/btn_layout"
+                    android:visibility="visible"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
                     <Button
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:id="@+id/btnPay"
+                        android:textColor="@color/colorAdText"
                         android:text="Buy"/>
 
                     <Button
+                        android:id="@+id/chat_button"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/colorAdText"
                         android:text="Chat" />
+
                 </LinearLayout>
 
 

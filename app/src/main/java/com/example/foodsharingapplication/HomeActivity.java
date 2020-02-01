@@ -1,30 +1,45 @@
 package com.example.foodsharingapplication;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.foodsharingapplication.Maps.MapsActivity;
 import com.example.foodsharingapplication.authentication.AuthemnticationFragments.ProfileHomeFragment;
 import com.example.foodsharingapplication.authentication.Authentication_Firebase;
-import com.example.foodsharingapplication.authentication.SignIn;
 import com.example.foodsharingapplication.model.User;
+import com.example.foodsharingapplication.model.UserUploadFoodModel;
+import com.example.foodsharingapplication.products.FavoritesListView;
+import com.example.foodsharingapplication.products.MessageListActivity;
 import com.example.foodsharingapplication.products.ProductsFragment.ProductGridView;
 import com.example.foodsharingapplication.products.ProductsFragment.ProductListView;
 import com.example.foodsharingapplication.products.ProductsFragment.UploadDataFragment;
+import com.example.foodsharingapplication.products.UserFavoritesFood;
+import com.example.foodsharingapplication.products.UserOrderedFood;
 import com.example.foodsharingapplication.products.UserUploadedFood;
-import com.example.foodsharingapplication.userOrdersAndUploadedAds.UserOrderAndUploads;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +53,10 @@ import com.squareup.picasso.Picasso;
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private static final String TAG = HomeActivity.class.getSimpleName();
+    public static boolean mLocationPermissionGranted;
+    public static LatLng curr;
     BottomNavigationView nav_bar;
     FirebaseAuth firebaseAuth;
     FirebaseAuth.AuthStateListener firebaseAuthListener;
@@ -50,15 +69,18 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private TextView txtHeaderName;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference firebaseDatabaseRef;
-
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private Location mLastKnownLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-        //getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new ProductListView()).commit();
-
+        //getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new FavoritesListView()).commit();
+        getLocationPermission();
+        getDeviceLocation();
         userData = new User();
         authentication_firebase = new Authentication_Firebase(getApplicationContext());
 
@@ -67,7 +89,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
+        //Toolbar searchToolbar = findViewById(R.id.searchToolbar);
         drawerLayout = findViewById(R.id.drawer_layout);
+
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.navigationDrawerOpen, R.string.navigationDrawerClose);
@@ -88,27 +112,59 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         /*Log.i("auth.getUserName: ", firebaseAuth.getCurrentUser().getDisplayName());
         Log.i("auth.getUserEmail: ", firebaseAuth.getCurrentUser().getEmail());*/
         //firebaseAuth.getCurrentUser().getPhotoUrl();
-        if (firebaseAuth.getCurrentUser()!=null){
-            txtHeaderEmail.setText(firebaseAuth.getCurrentUser().getEmail().toString());
-            firebaseDatabaseRef.child(firebaseAuth.getCurrentUser().getUid())
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            userData = dataSnapshot.getValue(User.class);
-                            txtHeaderEmail.setText(firebaseAuth.getCurrentUser().getEmail());
-                            //txtHeaderName.setText(userData.getUserName());
-                            //String profilePicUrl = userData.getUserProfilePicUrl();
-                           /* Log.i("auth.getUserName: ", userData.getUserName());
-                            Log.i("auth.getUserEmail: ", firebaseAuth.getCurrentUser().getEmail());*/
-                            //Picasso.get().load(profilePicUrl).centerCrop().fit().into(headerUserProfilePic);
+        try {
+            if (firebaseAuth.getCurrentUser() != null) {
+                firebaseDatabaseRef.child(firebaseAuth.getCurrentUser().getUid())
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                userData = dataSnapshot.getValue(User.class);
+/*                                if (!userData.getUserEmail().isEmpty()) {
+                                    txtHeaderEmail.setText(userData.getUserEmail());
+                                }
 
-                        }
+                                if (!userData.getUserName().isEmpty()) {
+                                    txtHeaderName.setText(userData.getUserName());
+                                }
+                                if (!userData.getUserProfilePicUrl().isEmpty()) {
+                                    Picasso.get().load(userData.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
+                                }
+*/
+                            }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                        }
-                    });
+                            }
+                        });
+//            firebaseDatabaseRef.child(firebaseAuth.getCurrentUser().getUid())
+//                    .addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                            userData = dataSnapshot.getValue(User.class);
+//                            if (!userData.getUserEmail().isEmpty()){
+//                                txtHeaderEmail.setText(userData.getUserEmail());
+//                            }
+//
+//                            if (!userData.getUserName().isEmpty()){
+//                                txtHeaderName.setText(userData.getUserName());
+//                            }
+//                            //String profilePicUrl = userData.getUserProfilePicUrl();
+//                           /* Log.i("auth.getUserName: ", userData.getUserName());
+//                            Log.i("auth.getUserEmail: ", firebaseAuth.getCurrentUser().getEmail());*/
+//                            //Picasso.get().load(profilePicUrl).centerCrop().fit().into(headerUserProfilePic);
+//
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                        }
+//                    });
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 
@@ -123,6 +179,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         //.setCustomAnimations(R.anim.slide_in,R.anim.slide_out)
                         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new ProductGridView()).commit();
                         return true;
+
+                    case R.id.list:
+                        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new ProductListView()).commit();
+                        return true;
+
                     case R.id.add:
                         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new UploadDataFragment()).commit();
                         return true;
@@ -146,6 +207,54 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             navigationView.setCheckedItem(R.id.homeFragment);
 
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.clear();
+        getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            // ////////// Functions for Searching ///////////
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String srchTxt = newText.substring(0, 1).toUpperCase();
+                final String querytext = srchTxt + newText.substring(1);
+                ProductGridView.getInstance().firebaseSearch(querytext);
+                firebaseDatabaseRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()){
+                            UserUploadFoodModel userUploadFoodModel= ds.getValue(UserUploadFoodModel.class);
+                            if (querytext.equals(userUploadFoodModel.getFoodTitle())){
+                                //ProductGridView.getInstance().firebaseSearch(querytext);
+                                UserOrderedFood.getInstance().showSearch(userUploadFoodModel);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                /*String s1 = query.substring(0, 1).toUpperCase();
+                String nameCapitalized = s1 + query.substring(1);
+                ProductGridView.getInstance().firebaseSearch(nameCapitalized);*/
+
+                return false;
+            }
+
+        });
+        return true;
     }
 
     @Override
@@ -196,6 +305,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 //startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
                 break;
 
+            case R.id.myOrders:
+                startActivity(new Intent(HomeActivity.this, UserOrderedFood.class));
+
+                break;
+
             case R.id.myAds:
                 Intent intent = new Intent(HomeActivity.this, UserUploadedFood.class);
                 startActivity(intent);
@@ -203,16 +317,22 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 //nav_bar.setVisibility(View.GONE);
                 //startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
                 break;
+            case R.id.myFav:
+                startActivity(new Intent(HomeActivity.this, UserFavoritesFood.class));
 
+                break;
+
+            case R.id.messages:
+                Intent viewMessage = new Intent(HomeActivity.this, MessageListActivity.class);
+                startActivity(viewMessage);
+                //nav_bar.setVisibility(View.GONE);
+                //startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
+                break;
 
 
             case R.id.signOut:
                 firebaseAuth.signOut();
                 startActivity(new Intent(HomeActivity.this, HomeDefinition.class));
-
-                break;
-            case R.id.myOrders:
-                startActivity(new Intent(HomeActivity.this, UserOrderAndUploads.class));
 
                 break;
             /*case R.id.updateProfile:
@@ -224,4 +344,53 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public void getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+
+        } else {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    private void getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        try {
+            if (mLocationPermissionGranted) {
+                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            mLastKnownLocation = task.getResult();
+//                            curr = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+//                            Log.e(TAG, "current1" + curr);
+                        } else {
+                            Log.d(TAG, "Current location is null. Using defaults.");
+                            Log.e(TAG, "Exception: %s", task.getException());
+                        }
+                    }
+                });
+            }
+        } catch (SecurityException e) {
+            Log.e("Exception: %s", e.getMessage());
+        }
+    }
+
+
 }

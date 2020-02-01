@@ -3,8 +3,10 @@ package com.example.foodsharingapplication.products;
 import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodsharingapplication.R;
@@ -40,6 +42,12 @@ public class ViewHolder extends RecyclerView.ViewHolder {
         mPrice.setText(price);
         Picasso.get().load(logo).into(mLogo);
         Picasso.get().load(image).into(mImageView);
+
+    }
+    public void removeHolder(){
+        LinearLayout card = mView.findViewById(R.id.holder);
+        card.setVisibility(View.GONE);
+
 
     }
 

@@ -108,7 +108,8 @@
             android:layout_centerHorizontal="true"
             android:textColor="#A2A19F"
             android:textSize="15sp"
-            android:background="@drawable/small_button"/>
+            android:background="@drawable/small_button"
+            android:clickable="true"/>
 
 
 </RelativeLayout>

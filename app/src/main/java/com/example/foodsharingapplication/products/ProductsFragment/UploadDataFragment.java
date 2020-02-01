@@ -5,12 +5,16 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -29,21 +33,34 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.chivorn.smartmaterialspinner.SmartMaterialSpinner;
+import com.example.foodsharingapplication.HomeActivity;
+import com.example.foodsharingapplication.HomeDefinition;
+import com.example.foodsharingapplication.Maps.MapsActivity;
 import com.example.foodsharingapplication.R;
 import com.example.foodsharingapplication.model.User;
 import com.example.foodsharingapplication.model.UserUploadFoodModel;
+import com.example.foodsharingapplication.products.UserUploadedFoodDetails;
 import com.example.foodsharingapplication.products.ViewPageAdapter;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -54,6 +71,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.concurrent.Executor;
 
 
 import me.abhinay.input.CurrencyEditText;
@@ -67,6 +85,7 @@ public class UploadDataFragment extends Fragment {
 
     /*Model Class*/
     UserUploadFoodModel userUploadFoodModel;
+
 
     FirebaseAuth firebaseAuth;
 
@@ -92,6 +111,7 @@ public class UploadDataFragment extends Fragment {
 
     /*Spinner UI*/
     private SmartMaterialSpinner cuisineTypeSpinner, listFoodSpinner;
+    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
 
     /*ViewPager*/
     private ViewPager viewPager;
@@ -99,6 +119,7 @@ public class UploadDataFragment extends Fragment {
 
     /*Other Variable Declaration*/
     private String cuisine_type, days, title, description, pickUpDetails, price;
+    private static final String TAG = UploadDataFragment.class.getSimpleName();
 
     /*ArrayList*/
     ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
@@ -106,10 +127,12 @@ public class UploadDataFragment extends Fragment {
     private Uri mImageUri;
     private int uploadCount = 0;
 
+
     private String[] cuisines = {"Asian" , "Italian", "French", "FastFood", "German", "Continental",
     "South American", "Arabic", "African"};
 
     ArrayAdapter<String> foodListingAdapter;
+    private HomeActivity home = new HomeActivity();
 
     /*Other Static declarations*/
     private static final int MULTIPLE_IMAGE_REQUEST = 2;
@@ -502,6 +525,12 @@ public class UploadDataFragment extends Fragment {
         userUploadFoodModel.setFoodPrice(editTextPrice.getText().toString());
         userUploadFoodModel.setFoodPostedBy(currentUser);
 
+        Log.i("Longitude latitude" ,String.valueOf(home.curr));
+        Log.i("latitude" ,String.valueOf(home.curr.latitude));
+        Log.i("Longitude" ,String.valueOf(home.curr.longitude));
+        userUploadFoodModel.setLatitude(home.curr.latitude);
+        userUploadFoodModel.setLongitude(home.curr.longitude);
+
 
         DatabaseReference userFoodPostingReference;
         userFoodPostingReference = FirebaseDatabase.getInstance().getReference("Food")
@@ -515,9 +544,8 @@ public class UploadDataFragment extends Fragment {
         allFoodPostingReference = FirebaseDatabase.getInstance().getReference("Food")
                 .child("FoodByAllUsers");
         allFoodPostingReference.child(pushKey).setValue(userUploadFoodModel);
-
         Toast.makeText(getContext(), "Food Uploaded", Toast.LENGTH_SHORT).show();
-
+        startActivity(new Intent(getContext(), HomeDefinition.class));
     }
 
 }

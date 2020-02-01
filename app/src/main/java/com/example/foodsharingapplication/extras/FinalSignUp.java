@@ -1,4 +1,4 @@
-package com.example.foodsharingapplication.authentication;
+package com.example.foodsharingapplication.extras;
 
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
@@ -27,6 +27,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.foodsharingapplication.HomeActivity;
+import com.example.foodsharingapplication.authentication.DatePickerFragment;
 import com.example.foodsharingapplication.extras.MyDatePickerFragment;
 import com.example.foodsharingapplication.R;
 import com.example.foodsharingapplication.extras.ShowData_Fragment;

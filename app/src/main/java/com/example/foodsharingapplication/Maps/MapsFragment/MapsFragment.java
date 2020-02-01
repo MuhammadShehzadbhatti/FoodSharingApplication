@@ -425,8 +425,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
      */
     private void writeNewUser(GeoPoint geo ) {
         User user1=new User();
-        user1.setLatitude(geo.getLatitude());
-        user1.setLongitude(geo.getLongitude());
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // Name, email address, and profile photo Url

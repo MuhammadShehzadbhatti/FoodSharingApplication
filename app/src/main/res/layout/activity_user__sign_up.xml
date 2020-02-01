@@ -6,7 +6,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="10dp"
     android:background="#fff"
-    tools:context=".authentication.User_SignUp">
+    tools:context=".authentication.User_SignUp"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
 
     <ImageView
@@ -36,49 +38,71 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="40dp"
         android:layout_marginLeft="40dp">
-
-        <EditText
-            android:id="@+id/firstName_SignUp"
-            android:hint="First Name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:inputType="text"
-            android:textColorHighlight="#A2A19F"
-            android:textColorHint="#A2A19F"
-            android:textSize="12sp"
-            android:textColor="#A2A19F" />
-
-
-        <EditText
-            android:id="@+id/lastName_SignUp"
-            android:layout_below="@+id/firstName_SignUp"
-            android:hint="Last Name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:inputType="text"
-            android:textColorHighlight="#A2A19F"
-            android:textColorHint="#A2A19F"
-            android:textSize="12sp"
-            android:textColor="#A2A19F" />
-
-        <EditText
-            android:id="@+id/enterEmail_SignUp"
-            android:hint="Email"
-            android:layout_below="@+id/lastName_SignUp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:inputType="text"
-            android:textColorHighlight="#A2A19F"
-            android:textColorHint="#A2A19F"
-            android:textSize="12sp"
-            android:textColor="#A2A19F" />
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/enterEmail_SignUp"
+            android:id="@+id/inputfirstName">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/firstName_SignUp"
+                android:hint="First Name"
+                android:inputType="text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColorHighlight="#A2A19F"
+                android:textColorHint="#A2A19F"
+                android:textSize="12sp"
+                android:textColor="#A2A19F"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/inputfirstName"
+            android:id="@+id/inputlastName">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/lastName_SignUp"
+                android:hint="Last Name"
+                android:inputType="text"
+                android:layout_below="@+id/enterEmail_SignUp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColorHighlight="#A2A19F"
+                android:textColorHint="#A2A19F"
+                android:textSize="12sp"
+                android:textColor="#A2A19F"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/inputlastName"
+            android:id="@+id/inputEmail">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/enterEmail_SignUp"
+                android:hint="Email"
+                android:inputType="text"
+                android:layout_below="@+id/enterEmail_SignUp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColorHighlight="#A2A19F"
+                android:textColorHint="#A2A19F"
+                android:textSize="12sp"
+                android:textColor="#A2A19F"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="hellow"
+                android:textSize="10dp"
+                android:textColor="@color/bt_error_red"
+                android:id="@+id/emailVarificationError"
+                android:visibility="gone"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/inputEmail"
             android:id="@+id/inputPassword"
             app:errorEnabled="true"
             app:passwordToggleEnabled="true">
@@ -95,21 +119,29 @@
                 android:textColorHint="#A2A19F"
                 android:textSize="12sp"
                 android:textColor="#A2A19F"/>
-            <!--<EditText
-                android:id="@+id/enterPassword_SignUp"
-                android:hint="Password"
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/inputPassword"
+            android:id="@+id/inputconfirmPassword_SignUp"
+            app:errorEnabled="true">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/confirmPassword_SignUp"
+                android:hint="Confirm Password"
                 android:ems="10"
                 android:inputType="textPassword"
-                android:layout_below="@+id/enterEmail_SignUp"
+                android:layout_below="@+id/inputPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textColorHighlight="#A2A19F"
                 android:textColorHint="#A2A19F"
                 android:textSize="12sp"
-                android:textColor="#A2A19F" />-->
+                android:textColor="#A2A19F"/>
         </com.google.android.material.textfield.TextInputLayout>
-        <EditText
+        <!--<EditText
             android:id="@+id/confirmPassword_SignUp"
             android:hint="Confirm Password"
             android:inputType="textPassword"
@@ -121,30 +153,28 @@
             android:textColorHighlight="#A2A19F"
             android:textColorHint="#A2A19F"
             android:textSize="12sp"
-            android:textColor="#A2A19F" />
+            android:textColor="#A2A19F" />-->
 
 
         <RelativeLayout
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:id="@+id/uploadProfilePic"
-            android:layout_below="@id/confirmPassword_SignUp"
+            android:layout_below="@id/inputconfirmPassword_SignUp"
             android:layout_marginTop="10dp"
             android:padding="5dp">
-            <ImageView
-                android:id="@+id/profileImgView_SignUp"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_alignParentLeft="true"
-                android:visibility="visible" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btnChoose_SignUp"
                 android:layout_width="60dp"
                 android:layout_height="40dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"
                 android:background="@drawable/ic_camera_alt_black_24dp" />
+            <ImageView
+                android:id="@+id/profileImgView_SignUp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentLeft="true"
+                android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/btnUpload_SignUp"
@@ -166,7 +196,8 @@
             android:layout_centerHorizontal="true"
             android:textColor="#A2A19F"
             android:textSize="15sp"
-            android:background="@drawable/small_button" />
+            android:background="@drawable/small_button"
+            android:clickable="true"/>
 
     </RelativeLayout>
     <TextView

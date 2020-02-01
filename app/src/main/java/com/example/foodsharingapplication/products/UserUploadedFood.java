@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.foodsharingapplication.Adapters.UserUploadedFoodAdapter;
 import com.example.foodsharingapplication.R;
@@ -51,6 +52,8 @@ public class UserUploadedFood extends AppCompatActivity implements UserUploadedF
 
         adapter = new UserUploadedFoodAdapter(this, userUploadFoodModelList);
         adapter.setClickListener(this);
+
+        Toast.makeText(this,"hay hay", Toast.LENGTH_SHORT).show();
 
         viewDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override

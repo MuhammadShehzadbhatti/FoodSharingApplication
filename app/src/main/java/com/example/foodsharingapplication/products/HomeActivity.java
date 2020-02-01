@@ -16,6 +16,7 @@ import com.example.foodsharingapplication.Dashboard;
 import com.example.foodsharingapplication.R;
 import com.example.foodsharingapplication.Settings;
 import com.example.foodsharingapplication.authentication.ShowData;
+import com.example.foodsharingapplication.authentication.SignIn;
 import com.example.foodsharingapplication.products.ProductsFragment.ProductGridView;
 import com.example.foodsharingapplication.products.ProductsFragment.ProductListView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -42,6 +43,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        if (verifyUser()){
+            Toast.makeText(HomeActivity.this,"True",Toast.LENGTH_SHORT).show();
+        }
 
         Toolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -56,19 +61,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                if (firebaseUser == null) {
-
-                    Toast.makeText(HomeActivity.this, "Successfully Signed Out: ", Toast.LENGTH_SHORT).show();
-
-                }
-            }
-        };
 
 
         // Navigation Bar Grid View
@@ -98,6 +90,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             navigationView.setCheckedItem(R.id.homeFragment);
 
         }
+    }
+
+    private Boolean verifyUser() {
+        Boolean isVerified = false;
+        if (firebaseAuth.getCurrentUser().isEmailVerified()){
+            isVerified = true;
+        }
+        return isVerified;
     }
 
     @Override

@@ -2,13 +2,16 @@ package com.example.foodsharingapplication.Maps;
 
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 //import android.support.annotation.NonNull;
 //import android.support.v4.app.ActivityCompat;
 //import android.support.v4.content.ContextCompat;
 //import android.support.v7.app.AlertDialog;
 //import android.support.v7.app.AppCompatActivity;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,9 +29,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.room.Database;
 
+import com.example.foodsharingapplication.model.ClusterMarker;
+import com.google.maps.android.clustering.ClusterManager;
+import com.squareup.picasso.Picasso;
+
+import com.example.foodsharingapplication.HomeActivity;
 import com.example.foodsharingapplication.R;
 import com.example.foodsharingapplication.model.User;
 import com.example.foodsharingapplication.model.UserLocation;
+import com.example.foodsharingapplication.model.UserUploadFoodModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -65,7 +74,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.android.SphericalUtil;
-
+import com.example.foodsharingapplication.MyClusterManagerRenderer;
 import java.lang.reflect.Type;
 import java.sql.Array;
 import java.util.ArrayList;
@@ -111,6 +120,7 @@ public class MapsActivity extends AppCompatActivity
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
+    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
 
     // Used for selecting the current place.
     private static final int M_MAX_ENTRIES = 5;
@@ -125,16 +135,19 @@ public class MapsActivity extends AppCompatActivity
     private ArrayList<UserLocation> mUserLocations = new ArrayList<>();
     private FirebaseFirestore mDb;
     private ListenerRegistration mChatMessageEventListener, mUserListEventListener;
-    private FirebaseDatabase database1;
+    private DatabaseReference database1;
     private DatabaseReference ref;
-    private static ArrayList<UserLocation> Userloc=new ArrayList<>();;
+    private static ArrayList<UserUploadFoodModel> Userloc=new ArrayList<>();;
     private ArrayAdapter<UserLocation> adapter;
-    private UserLocation user;
+    private UserUploadFoodModel user;
     private LatLng diff;
-    private LatLng curr;
+    public LatLng curr;
     private static ArrayList<Double> distances=new ArrayList<>();
     private Array gmark;
     private ArrayList<Marker> mTripMarkers = new ArrayList<>();
+    private HomeActivity home =new HomeActivity();
+    private ClusterManager<ClusterMarker> mClusterManager;
+    private MyClusterManagerRenderer mClusterManagerRenderer;
 
 
     @Override
@@ -217,7 +230,9 @@ public class MapsActivity extends AppCompatActivity
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
-        getuser();
+
+            getuser();
+
 
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
@@ -250,11 +265,7 @@ public class MapsActivity extends AppCompatActivity
 
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
-        circle1 = mMap.addCircle(circle
-                .center(new LatLng(0,0))
-                .radius(1000000)
-                .strokeWidth(5f)
-                .fillColor(0x515000FF));
+
 
 
         // Get the current location of the device and set the position of the map.
@@ -283,8 +294,7 @@ public class MapsActivity extends AppCompatActivity
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
                             geo= new GeoPoint((float)mLastKnownLocation.getLatitude(),(float)mLastKnownLocation.getLongitude());
                             curr=new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
-                            writeNewUser(geo);
-                            circle1.setCenter(new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude()));
+                            //writeNewUser(geo);
 
 
 
@@ -295,7 +305,6 @@ public class MapsActivity extends AppCompatActivity
                                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                                     progress1=progress*1000;
                                     Log.e(TAG, "onProgressChanged: "+progress1);
-                                    circle1.setRadius(progress1);
                                     Log.e(TAG,"user loc size= "+Userloc.size());
                                     for (int i = 0; i < Userloc.size(); i++){
 
@@ -304,8 +313,9 @@ public class MapsActivity extends AppCompatActivity
 
                                     }
                                     Log.e(TAG,"distances size= "+Userloc.size());
+                                    resetMap();
 
-                                    PointerPlacer(distances,progress1,Userloc);
+                                    PointerPlacer(curr,distances,progress1,Userloc);
                                 }
                                 @Override
                                 public void onStartTrackingTouch(SeekBar seekBar) {
@@ -346,82 +356,178 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
-    private void PointerPlacer(ArrayList<Double> distances, int progress1, ArrayList<UserLocation> userloc) {
-        removeTripMarkers();
+    private void PointerPlacer(LatLng curr, ArrayList<Double> distances, int progress1, ArrayList<UserUploadFoodModel> userloc) {
+        resetMap();
+
+        //removeTripMarkers();
+
+        if(mClusterManager == null){
+           mClusterManager = new ClusterManager<ClusterMarker>(this.getApplicationContext(), mMap);
+        }
+
+        if(mClusterManagerRenderer == null){
+            mClusterManagerRenderer = new MyClusterManagerRenderer(
+                    this,
+                    mMap,
+                    mClusterManager
+            );
+            mClusterManager.setRenderer(mClusterManagerRenderer);
+        }
+        String snippet="descript" ;
+        int avatar = R.drawable.veganfood; // set the default avatar
+
+        String myUri ="https://firebasestorage.googleapis.com/v0/b/foodsavingapp.appspot.com/o/SellerImageFolder%2FImages%2F1579656399870.jpg?alt=media&token=f8e8cabd-4490-42e8-bddf-c45aae31582c";
+
 
         if (progress1==1000) {
+           // removeTripMarkers();
             for (int i = 0; i < userloc.size(); i++){
-                if (distances.get(i)<1000 && distances.get(i)>10){
-                    mTripMarkers.add(mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()))
-                            .title("Hello world")));
-                    //   return;
+                if (distances.get(i)<1000 ){
+                    ClusterMarker newClusterMarker = new ClusterMarker(
+                            new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
+                            userloc.get(i).getUser().getUserName(),
+                            snippet,
+                            avatar,
+                            userloc.get(i).getUser()
+                    );
+                    circle1 = mMap.addCircle(circle
+                            .center(new LatLng(curr.latitude,curr.longitude))
+                            .radius(progress1)
+                            .strokeWidth(5f)
+                            .fillColor(0x515000FF));
+
+
+                    mClusterManager.addItem(newClusterMarker);
+                    mClusterMarkers.add(newClusterMarker);
+                    Log.e(TAG, "PointerPlacer: here5" );
 
                 }
-                Log.e(TAG, "PointerPlacer: here5" );
 
 
             }
+
+            mClusterManager.cluster();
+
 
         }
         if (progress1==2000) {
             for (int i = 0; i < userloc.size(); i++){
-                if (distances.get(i)<2000 && distances.get(i)>10){
-                    mTripMarkers.add(mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()))
-                            .title("Hello world")));
-                    //   return;
+                if (distances.get(i)<2000 ){
+                    ClusterMarker newClusterMarker = new ClusterMarker(
+                            new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
+                            userloc.get(i).getUser().getUserName(),
+                            snippet,
+                            avatar,
+                            userloc.get(i).getUser()
+                    );
+                    circle1 = mMap.addCircle(circle
+                            .center(new LatLng(curr.latitude,curr.longitude))
+                            .radius(progress1)
+                            .strokeWidth(5f)
+                            .fillColor(0x515000FF));
+
+
+                    mClusterManager.addItem(newClusterMarker);
+                    mClusterMarkers.add(newClusterMarker);
+                    Log.e(TAG, "PointerPlacer: here5" );
 
                 }
                 Log.e(TAG, "PointerPlacer: here5" );
 
 
             }
+            mClusterManager.cluster();
+
 
         }
         if (progress1==3000) {
             for (int i = 0; i < userloc.size(); i++){
-                if (distances.get(i)<3000 && distances.get(i)>10){
-                    mTripMarkers.add(mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()))
-                            .title("Hello world")));
-                    //   return;
+                if (distances.get(i)<3000 ){
+                    ClusterMarker newClusterMarker = new ClusterMarker(
+                            new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
+                            userloc.get(i).getUser().getUserName(),
+                            snippet,
+                            avatar,
+                            userloc.get(i).getUser()
+                    );
+                    circle1 = mMap.addCircle(circle
+                            .center(new LatLng(curr.latitude,curr.longitude))
+                            .radius(progress1)
+                            .strokeWidth(5f)
+                            .fillColor(0x515000FF));
+
+
+                    mClusterManager.addItem(newClusterMarker);
+                    mClusterMarkers.add(newClusterMarker);
+                    Log.e(TAG, "PointerPlacer: here5" );
 
                 }
                 Log.e(TAG, "PointerPlacer: here5" );
 
 
             }
+            mClusterManager.cluster();
+
 
         }
         if (progress1==4000) {
             for (int i = 0; i < userloc.size(); i++){
-                if (distances.get(i)<4000 && distances.get(i)>10){
-                    mTripMarkers.add(mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()))
-                            .title("Hello world")));
-                    //   return;
+                if (distances.get(i)<4000 ){
+                    ClusterMarker newClusterMarker = new ClusterMarker(
+                            new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
+                            userloc.get(i).getUser().getUserName(),
+                            snippet,
+                            avatar,
+                            userloc.get(i).getUser()
+                    );
+                    circle1 = mMap.addCircle(circle
+                            .center(new LatLng(curr.latitude,curr.longitude))
+                            .radius(progress1)
+                            .strokeWidth(5f)
+                            .fillColor(0x515000FF));
+
+
+                    mClusterManager.addItem(newClusterMarker);
+                    mClusterMarkers.add(newClusterMarker);
+                    Log.e(TAG, "PointerPlacer: here5" );
 
                 }
                 Log.e(TAG, "PointerPlacer: here5" );
 
 
             }
+            mClusterManager.cluster();
+
 
         }
         if (progress1==5000) {
             for (int i = 0; i < userloc.size(); i++){
-                if (distances.get(i)<5000 && distances.get(i)>10){
-                    mTripMarkers.add(mMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()))
-                            .title("Hello world")));
-                    //   return;
+                if (distances.get(i)<5000 ){
+                    ClusterMarker newClusterMarker = new ClusterMarker(
+                            new LatLng(userloc.get(i).getLatitude(), userloc.get(i).getLongitude()),
+                            userloc.get(i).getUser().getUserName(),
+                            snippet,
+                            avatar,
+                            userloc.get(i).getUser()
+                    );
+                    circle1 = mMap.addCircle(circle
+                            .center(new LatLng(curr.latitude,curr.longitude))
+                            .radius(progress1)
+                            .strokeWidth(5f)
+                            .fillColor(0x515000FF));
+
+
+                    mClusterManager.addItem(newClusterMarker);
+                    mClusterMarkers.add(newClusterMarker);
+                    Log.e(TAG, "PointerPlacer: here5" );
 
                 }
                 Log.e(TAG, "PointerPlacer: here5" );
 
 
             }
+            mClusterManager.cluster();
+
 
         }
 
@@ -432,8 +538,7 @@ public class MapsActivity extends AppCompatActivity
      */
     private void writeNewUser(GeoPoint geo ) {
         User user1=new User();
-        user1.setLatitude(geo.getLatitude());
-        user1.setLongitude(geo.getLongitude());
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // Name, email address, and profile photo Url
@@ -449,7 +554,7 @@ public class MapsActivity extends AppCompatActivity
     /**
      * Prompts the user for permission to use the device location.
      */
-    private void getLocationPermission() {
+    public void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
          * device. The result of the permission request is handled by a callback,
@@ -459,7 +564,9 @@ public class MapsActivity extends AppCompatActivity
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
+
         } else {
+
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -604,7 +711,7 @@ public class MapsActivity extends AppCompatActivity
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */
-    private void updateLocationUI() {
+    public void updateLocationUI() {
         if (mMap == null) {
             return;
         }
@@ -635,15 +742,15 @@ public class MapsActivity extends AppCompatActivity
         //return ;
     }
     private void getuser(){
-        database1=FirebaseDatabase.getInstance();
-        ref=database1.getReference("UserLocation");
-        user=new UserLocation();
+        database1=FirebaseDatabase.getInstance().getReference("Food");
+        ref=database1.child("FoodByAllUsers");
+        user=new UserUploadFoodModel();
         //adapter=new ArrayAdapter<UserLocation>(this,);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds: dataSnapshot.getChildren()){
-                    user=ds.getValue(UserLocation.class);
+                    user=ds.getValue(UserUploadFoodModel.class);
                     Userloc.add(user);
 
                     Log.e(TAG,"UID "+user.getLatitude());
@@ -666,9 +773,59 @@ public class MapsActivity extends AppCompatActivity
      * removes markers from maps
      */
     private void removeTripMarkers(){
-        for(Marker marker: mTripMarkers){
-            marker.remove();
-        }
+
+            mClusterManager.clearItems();
+
         return;
     }
+    private void addMapMarkers(){
+
+
+
+
+            //mMap.setOnInfoWindowClickListener(this.MapsActivity);
+
+            for(UserUploadFoodModel userLocation:Userloc){
+
+                Log.d(TAG, "addMapMarkers: location: " + userLocation.getLatitude());
+                try{
+                    String snippet ;
+
+                        snippet = "Determine route to  ?";
+
+
+                    int avatar = R.drawable.cartman_cop; // set the default avatar
+                    try{
+                        //avatar = Integer.parseInt(userLocation.getUser().getAvatar());
+                    }catch (NumberFormatException e){
+                        Log.d(TAG, "addMapMarkers: no avatar for , setting default.");
+                    }
+
+
+                }catch (NullPointerException e){
+                    Log.e(TAG, "addMapMarkers: NullPointerException: " + e.getMessage() );
+                }
+
+            }
+            mClusterManager.cluster();
+
+
+    }
+    private void resetMap(){
+        if(mMap != null) {
+            mMap.clear();
+
+            if(mClusterManager != null){
+                mClusterManager.clearItems();
+            }
+
+            if (mClusterMarkers.size() > 0) {
+                mClusterMarkers.clear();
+                mClusterMarkers = new ArrayList<>();
+            }
+
+        }
+    }
+
+
 }

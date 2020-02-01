@@ -10,5 +10,6 @@
     <color name="blueColor">#2196F3</color>
     <color name="colorImageViewBackground">#F2F0E6</color>
     <color name="colorText">#FFFFFF</color>
+    <color name="colorAdText">#000000</color>
 
 </resources>
