@@ -10,8 +10,6 @@ import com.example.foodsharingapplication.authentication.SignIn;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.Objects;
-
 public class HomeDefinition extends AppCompatActivity {
 
     Intent intent;
@@ -26,7 +24,8 @@ public class HomeDefinition extends AppCompatActivity {
         if (firebaseUser != null) {
             if (firebaseAuth.getCurrentUser().isEmailVerified()) {
                 intent = new Intent(this, HomeActivity.class);
-            }else {
+
+            } else {
                 toastMessage("Email verification required");
                 firebaseAuth.signOut();
                 intent = new Intent(this, SignIn.class);

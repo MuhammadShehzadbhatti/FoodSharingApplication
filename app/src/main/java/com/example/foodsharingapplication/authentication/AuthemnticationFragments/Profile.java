@@ -3,7 +3,6 @@ package com.example.foodsharingapplication.authentication.AuthemnticationFragmen
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import androidx.fragment.app.Fragment;
 import com.example.foodsharingapplication.R;
 import com.example.foodsharingapplication.authentication.SignIn;
 import com.example.foodsharingapplication.model.User;
-import com.example.foodsharingapplication.products.ProductsFragment.ProductGridView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -53,7 +51,6 @@ public class Profile extends Fragment {
         Toast.makeText(getContext(), "Profile", Toast.LENGTH_SHORT).show();
         userName = view.findViewById(R.id.showUserName);
         userEmail = view.findViewById(R.id.showUserEmail);
-        userPassword = view.findViewById(R.id.showUserPassword);
         btnEditProfile = view.findViewById(R.id.btnEditProfile);
         userProfilePic = view.findViewById(R.id.userProfilePic);
         logoImg = view.findViewById(R.id.logoImg);
@@ -84,9 +81,6 @@ public class Profile extends Fragment {
     }
 
 
-
-
-
     public void getCurrentUserProfile() {
         databaseReference.child(Objects.requireNonNull(firebaseUser.getUid())).addValueEventListener(new ValueEventListener() {
             @Override
@@ -97,7 +91,11 @@ public class Profile extends Fragment {
                 Log.i(" getUserProfilePicUrl ", userData.getUserProfilePicUrl());*/
                 userName.setText(userData.getUserName());
                 userEmail.setText(userData.getUserEmail());
-                Picasso.get().load(userData.getUserProfilePicUrl()).centerCrop().fit().into(logoImg);
+                if (userData.getUserProfilePicUrl() != null) {
+                    Picasso.get().load(userData.getUserProfilePicUrl()).centerCrop().fit().into(logoImg);
+                } else {
+                    Picasso.get().load(R.drawable.user_circle).centerCrop().fit().into(logoImg);
+                }
 
             }
 

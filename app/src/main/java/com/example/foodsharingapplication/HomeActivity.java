@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -103,67 +104,33 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         txtHeaderEmail = headerView.findViewById(R.id.headerUserEmail);
         txtHeaderName = headerView.findViewById(R.id.headerUserName);
         headerUserProfilePic = headerView.findViewById(R.id.headerUserProfilePic);
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabaseRef = mFirebaseDatabase.getReference("User");
-        /*firebaseAuth.getCurrentUser().getEmail();
-        firebaseAuth.getCurrentUser().getDisplayName();*/
-        /*Log.i("auth.getUserName: ", firebaseAuth.getCurrentUser().getDisplayName());
-        Log.i("auth.getUserEmail: ", firebaseAuth.getCurrentUser().getEmail());*/
-        //firebaseAuth.getCurrentUser().getPhotoUrl();
-        try {
-            if (firebaseAuth.getCurrentUser() != null) {
-                firebaseDatabaseRef.child(firebaseAuth.getCurrentUser().getUid())
-                        .addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                userData = dataSnapshot.getValue(User.class);
-                                if (!userData.getUserEmail().isEmpty()) {
-                                    txtHeaderEmail.setText(userData.getUserEmail());
-                                }
+        DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference("User").child(firebaseAuth.getCurrentUser().getUid());
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user= dataSnapshot.getValue(User.class);
 
-                                if (!userData.getUserName().isEmpty()) {
-                                    txtHeaderName.setText(userData.getUserName());
-                                }
-                                if (!userData.getUserProfilePicUrl().isEmpty()) {
-                                    Picasso.get().load(userData.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
-                                }
+                Log.i("user.getUserName()1",user.getUserName());
+                    if (user.getUserName() != "") {
+                        Log.i("user.getUserName()",user.getUserName());
+                        txtHeaderEmail.setText(user.getUserName());
+                    }
 
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-//            firebaseDatabaseRef.child(firebaseAuth.getCurrentUser().getUid())
-//                    .addValueEventListener(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                            userData = dataSnapshot.getValue(User.class);
-//                            if (!userData.getUserEmail().isEmpty()){
-//                                txtHeaderEmail.setText(userData.getUserEmail());
-//                            }
-//
-//                            if (!userData.getUserName().isEmpty()){
-//                                txtHeaderName.setText(userData.getUserName());
-//                            }
-//                            //String profilePicUrl = userData.getUserProfilePicUrl();
-//                           /* Log.i("auth.getUserName: ", userData.getUserName());
-//                            Log.i("auth.getUserEmail: ", firebaseAuth.getCurrentUser().getEmail());*/
-//                            //Picasso.get().load(profilePicUrl).centerCrop().fit().into(headerUserProfilePic);
-//
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                        }
-//                    });
+                    if (user.getUserEmail() != "") {
+                        Log.i("user.getUserEmail()",user.getUserEmail());
+                        txtHeaderName.setText(user.getUserEmail());
+                    }
+                    if (user.getUserProfilePicUrl() != null) {
+                        Log.i("user.getUserPicUrl()",user.getUserProfilePicUrl());
+                        Picasso.get().load(user.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
+                    }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         // Navigation Bar Grid View
@@ -225,9 +192,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 firebaseDatabaseRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot ds : dataSnapshot.getChildren()){
-                            UserUploadFoodModel userUploadFoodModel= ds.getValue(UserUploadFoodModel.class);
-                            if (querytext.equals(userUploadFoodModel.getFoodTitle())){
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            UserUploadFoodModel userUploadFoodModel = ds.getValue(UserUploadFoodModel.class);
+                            if (querytext.equals(userUploadFoodModel.getFoodTitle())) {
                                 //ProductGridView.getInstance().firebaseSearch(querytext);
                                 UserOrderedFood.getInstance().showSearch(userUploadFoodModel);
                             }

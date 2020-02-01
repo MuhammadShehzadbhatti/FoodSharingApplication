@@ -32,7 +32,6 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -87,12 +86,9 @@ public class UpdateProfile extends Fragment implements DialogeConfirmCredentials
         confirmUserNewPassword = view.findViewById(R.id.editUserConfirmPassword);
         editProfile = view.findViewById(R.id.editProfile);
         btnSubmitChanges = view.findViewById(R.id.btnSubmitUpdates);
-        userProfilePic = view.findViewById(R.id.userProfilePic);
+        userProfilePic = view.findViewById(R.id.logoImg_SignUp);
         btnUser_ChooseImage = view.findViewById(R.id.btnChoose_SignUp);
-        logoImg = view.findViewById(R.id.logoImg);
 
-        userProfilePic.setVisibility(View.VISIBLE);
-        logoImg.setVisibility(View.GONE);
 
         userData = new User();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -108,7 +104,12 @@ public class UpdateProfile extends Fragment implements DialogeConfirmCredentials
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 userData = dataSnapshot.getValue(User.class);
                 editUserName.setText(userData.getUserName());
-                Picasso.get().load(userData.getUserProfilePicUrl()).centerCrop().fit().into(userProfilePic);
+                if (userData.getUserProfilePicUrl() != null) {
+                    Picasso.get().load(userData.getUserProfilePicUrl()).centerCrop().fit().into(userProfilePic);
+                    toastMessage("Picture Updated");
+                } else {
+                    Picasso.get().load(R.drawable.user_circle).into(userProfilePic);
+                }
             }
 
             @Override

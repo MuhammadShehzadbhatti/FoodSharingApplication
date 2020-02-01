@@ -1,6 +1,7 @@
 package com.example.foodsharingapplication.authentication;
 
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foodsharingapplication.HomeDefinition;
@@ -61,6 +63,7 @@ public class User_SignUp extends AppCompatActivity {
     private DatabaseReference firebaseDatabaseRef;
     private String firbaseEmail;
     private ArrayList<String> arrayListEmail;
+    private AlertDialog.Builder builder;
 
 
     @Override
@@ -74,12 +77,13 @@ public class User_SignUp extends AppCompatActivity {
         txtUser_Password = findViewById(R.id.enterPassword_SignUp);
         txtUser_ConfirmPassword = findViewById(R.id.confirmPassword_SignUp);
         btnUser_ChooseImage = findViewById(R.id.btnChoose_SignUp);
-        btnUser_UploadImage = findViewById(R.id.btnUpload_SignUp);
         btnUser_SignUp = findViewById(R.id.btnSignup_SignUp);
-        imgUser_ProfileImage = findViewById(R.id.profileImgView_SignUp);
         logoImg_SignUp = findViewById(R.id.logoImg_SignUp);
         txtGo_ToLogin = findViewById(R.id.txtSignIn_SignUp);
         arrayListEmail = new ArrayList<>();
+
+        builder = new AlertDialog.Builder(this);
+
         userData = new User();
         authentication_firebase = new Authentication_Firebase(getApplicationContext());
         firebaseStorageReference = FirebaseStorage.getInstance().getReference("User");
@@ -91,12 +95,6 @@ public class User_SignUp extends AppCompatActivity {
                 chooseImage();
             }
         });
-        /*btnUser_UploadImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uploadImage();
-            }
-        });*/
 
         txtGo_ToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,8 +109,38 @@ public class User_SignUp extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 RegisterUser();
+                checkEmailDialogue();
             }
         });
+    }
+
+    private void checkEmailDialogue() {
+        //Uncomment the below code to Set the message and title from the strings.xml file
+        builder.setMessage("Please Check Your email") .setTitle("Email Verification ");
+
+        //Setting message manually and performing action on button click
+        builder.setMessage("Do you want to close this application ?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                        Toast.makeText(getApplicationContext(),"you choose yes action for alertbox",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //  Action for 'NO' Button
+                        dialog.cancel();
+                        Toast.makeText(getApplicationContext(),"you choose no action for alertbox",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+        //Creating dialog box
+        AlertDialog alert = builder.create();
+        //Setting the title manually
+        alert.setTitle("AlertDialogExample");
+        alert.show();
     }
 
     private void RegisterUser() {
@@ -272,7 +300,6 @@ public class User_SignUp extends AppCompatActivity {
                     filePath = data.getData();
                     Picasso.get().load(filePath).centerCrop().resize(90, 90).into(logoImg_SignUp);
                     uploadImage();
-                    btnUser_UploadImage.setVisibility(View.GONE);
                 }
                 break;
             case 1:
@@ -280,7 +307,6 @@ public class User_SignUp extends AppCompatActivity {
                     filePath = data.getData();
                     Picasso.get().load(filePath).centerCrop().resize(90, 90).into(logoImg_SignUp);
                     uploadImage();
-                    btnUser_UploadImage.setVisibility(View.VISIBLE);
                     btnUser_ChooseImage.setVisibility(View.GONE);
                 }
                 break;

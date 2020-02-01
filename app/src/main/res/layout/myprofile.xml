@@ -5,36 +5,39 @@
     android:padding="10dp"
     android:background="#fff">
     <RelativeLayout
-        android:layout_width="match_parent"
+        android:id="@+id/uploadProfilePic"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/profileHeader">
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:padding="5dp">
+
+        <!--<ImageView
+            android:id="@+id/logoImg"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/user_circle"
+            android:layout_margin="0dp"/>-->
         <ImageView
             android:id="@+id/logoImg"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/veganfood"
-            android:visibility="visible" />
-
-        <ImageView
-            android:id="@+id/userProfilePic"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/veganfood"
-            android:visibility="gone" />
+            android:background="@drawable/imagemain"
+            android:layout_margin="0dp"/>
 
         <TextView
-            android:id="@+id/showUserName"
+            android:id="@+id/signup_SignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/logoImg"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
-            android:textColorHighlight="#000"
-            android:textColorHint="#000"
-            android:textSize="15sp"
-            android:visibility="visible" />
+            android:text="Profile"
+            android:textColor="#A2A19F"
+            android:textSize="15sp" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -45,10 +48,12 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="40dp"
         android:layout_marginLeft="40dp"
-        android:layout_below="@+id/profileHeader"
+        android:layout_below="@+id/uploadProfilePic"
         android:visibility="visible"
         android:layout_marginTop="10dp"
         android:animateLayoutChanges="true">
+
+
 
         <TextView
             android:id="@+id/showUserEmail"
@@ -58,68 +63,23 @@
             android:hint="Email"
             android:textColorHighlight="#A2A19F"
             android:textColorHint="#A2A19F"
-            android:textSize="12sp" />
-
-
+            android:layout_centerHorizontal="true"
+            android:textSize="15sp"
+            android:background="@drawable/textviewborder" />
         <TextView
-            android:id="@+id/showUserPassword"
+            android:id="@+id/showUserName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/showUserEmail"
             android:layout_marginTop="10dp"
-            android:hint="Password"
-            android:inputType="textPassword"
+            android:hint="Name"
             android:textColorHighlight="#A2A19F"
+            android:layout_below="@id/showUserEmail"
             android:textColorHint="#A2A19F"
-            android:textSize="12sp" />
+            android:layout_alignParentLeft="true"
+            android:textSize="15sp"
+            android:background="@drawable/textviewborder" />
 
-        <TextView
-            android:id="@+id/showUserPhoneNumber"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/showUserPassword"
-            android:layout_marginTop="10dp"
-            android:hint="Phone Number"
-            android:inputType="text"
-            android:textColorHighlight="#A2A19F"
-            android:textColorHint="#A2A19F"
-            android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/gender"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/showUserPhoneNumber"
-            android:layout_marginTop="10dp"
-            android:hint="Gender"
-            android:inputType="text"
-            android:textColorHighlight="#A2A19F"
-            android:textColorHint="#A2A19F"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/userDOB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/gender"
-            android:layout_marginTop="10dp"
-            android:hint="Date of Birth"
-            android:inputType="text"
-            android:textColorHighlight="#A2A19F"
-            android:textColorHint="#A2A19F"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/userCountry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/userDOB"
-            android:layout_marginTop="10dp"
-            android:hint="Country"
-            android:inputType="text"
-            android:textColorHighlight="#A2A19F"
-            android:textColorHint="#A2A19F"
-            android:textSize="12sp" />
 
         <Button
             android:id="@+id/btnEditProfile"
@@ -127,7 +87,7 @@
             android:layout_width="80dp"
             android:layout_height="30dp"
             android:layout_marginTop="10dp"
-            android:layout_below="@id/userCountry"
+            android:layout_below="@id/showUserName"
             android:layout_centerHorizontal="true"
             android:textColor="#A2A19F"
             android:textSize="15sp"

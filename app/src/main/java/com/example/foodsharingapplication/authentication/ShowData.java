@@ -54,10 +54,8 @@ public class ShowData extends AppCompatActivity implements View.OnClickListener{
         pass= (TextView) findViewById(R.id.enterPassword);
         phoneNumber= (TextView) findViewById(R.id.phoneNumber);
         userCountry= (TextView) findViewById(R.id.userCountry);
-        userDOB= (TextView) findViewById(R.id.userDOB);
         gender= (TextView) findViewById(R.id.gender);
         listTextView= (TextView) findViewById(R.id.listTextView);
-        profileImage= (ImageView) findViewById(R.id.userProfilePic);
         Button cancelBtn= findViewById(R.id.btnCancel);
         /*btnEdit= findViewById(R.id.btnEdit);*/
         CheckBox showPassword= (CheckBox) findViewById(R.id.showPass);
