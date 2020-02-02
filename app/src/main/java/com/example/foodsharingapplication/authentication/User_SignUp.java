@@ -109,7 +109,6 @@ public class User_SignUp extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 RegisterUser();
-                checkEmailDialogue();
             }
         });
     }
@@ -121,16 +120,10 @@ public class User_SignUp extends AppCompatActivity {
         //Setting message manually and performing action on button click
         builder.setMessage("You received an email please click on the attacked link to verify the email address ")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         startActivity(new Intent(getApplicationContext(),SignIn.class));
                         //finish();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //  Action for 'NO' Button
-                        dialog.cancel();
                     }
                 });
         //Creating dialog box
@@ -246,6 +239,7 @@ public class User_SignUp extends AppCompatActivity {
                                                                                 } else {
                                                                                     firebaseAuth.signOut();
                                                                                     startActivity(new Intent(User_SignUp.this, HomeDefinition.class));
+                                                                                    checkEmailDialogue();
                                                                                     //finish();
                                                                                 }
                                                                                 toastMessage("Check your email for verification");

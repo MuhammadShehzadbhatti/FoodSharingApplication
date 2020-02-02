@@ -104,19 +104,19 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         txtHeaderEmail = headerView.findViewById(R.id.headerUserEmail);
         txtHeaderName = headerView.findViewById(R.id.headerUserName);
         headerUserProfilePic = headerView.findViewById(R.id.headerUserProfilePic);
+        Log.i("user.id",firebaseAuth.getCurrentUser().getUid());
         DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference("User").child(firebaseAuth.getCurrentUser().getUid());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user= dataSnapshot.getValue(User.class);
 
-                Log.i("user.getUserName()1",user.getUserName());
-                    if (user.getUserName() != "") {
+                    if (user.getUserName() != null) {
                         Log.i("user.getUserName()",user.getUserName());
                         txtHeaderEmail.setText(user.getUserName());
                     }
 
-                    if (user.getUserEmail() != "") {
+                    if (user.getUserEmail() != null) {
                         Log.i("user.getUserEmail()",user.getUserEmail());
                         txtHeaderName.setText(user.getUserEmail());
                     }
