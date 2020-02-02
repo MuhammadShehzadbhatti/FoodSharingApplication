@@ -155,6 +155,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     case R.id.map:
                         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                         startActivity(intent);
+                        finish();
                         //getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.slide_out).replace(R.id.fragment_container,new MapsFragment()).commit();
 
                         // ///// ADD more cases for different navigation bar options////////

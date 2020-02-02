@@ -101,7 +101,7 @@ public class User_SignUp extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(User_SignUp.this, SignIn.class);
                 startActivity(intent);
-                finish();
+                //finish();
             }
         });
 
@@ -124,7 +124,7 @@ public class User_SignUp extends AppCompatActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         startActivity(new Intent(getApplicationContext(),SignIn.class));
-                        finish();
+                        //finish();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -138,6 +138,12 @@ public class User_SignUp extends AppCompatActivity {
         //Setting the title manually
         alert.setTitle("Email Verification Alert:");
         alert.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), SignIn.class));
+        finish();
     }
 
     private void RegisterUser() {
@@ -236,15 +242,15 @@ public class User_SignUp extends AppCompatActivity {
                                                                             if (task.isSuccessful()) {
                                                                                 if (firebaseAuth.getCurrentUser().isEmailVerified()) {
                                                                                     startActivity(new Intent(User_SignUp.this, HomeDefinition.class));
-                                                                                    finish();
+                                                                                    //finish();
                                                                                 } else {
                                                                                     firebaseAuth.signOut();
                                                                                     startActivity(new Intent(User_SignUp.this, HomeDefinition.class));
-                                                                                    finish();
+                                                                                    //finish();
                                                                                 }
                                                                                 toastMessage("Check your email for verification");
                                                                                 startActivity(new Intent(User_SignUp.this, HomeDefinition.class));
-                                                                                finish();
+                                                                                //finish();
                                                                             } else {
                                                                                 toastMessage("Enter a valid email");
                                                                             }

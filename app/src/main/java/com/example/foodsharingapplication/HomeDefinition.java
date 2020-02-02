@@ -35,6 +35,7 @@ public class HomeDefinition extends AppCompatActivity {
             intent = new Intent(this, SignIn.class);
         }
         startActivity(intent);
+        finish();
     }
 
     public void toastMessage(String message) {
