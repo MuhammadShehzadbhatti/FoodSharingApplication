@@ -1,42 +1,42 @@
 {
   "project_info": {
-    "project_number": "759557187934",
-    "firebase_url": "https://foodsavingapp.firebaseio.com",
-    "project_id": "foodsavingapp",
-    "storage_bucket": "foodsavingapp.appspot.com"
+    "project_number": "22636660775",
+    "firebase_url": "https://myfirstapplication-3db65.firebaseio.com",
+    "project_id": "myfirstapplication-3db65",
+    "storage_bucket": "myfirstapplication-3db65.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:759557187934:android:b0b2b9f380024ed75647cf",
+        "mobilesdk_app_id": "1:22636660775:android:d8d6c3a4695347f8b9a602",
         "android_client_info": {
           "package_name": "com.example.foodsharingapplication"
         }
       },
       "oauth_client": [
         {
-          "client_id": "759557187934-b5poonl09huj9pusegrl8uiovh5b8q2r.apps.googleusercontent.com",
+          "client_id": "22636660775-hgg0bm8n1pbacbl6fotc4a9sn93b3p83.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.foodsharingapplication",
-            "certificate_hash": "4d24afd7878f7889c4f10f131f462b6ec877f806"
+            "certificate_hash": "b8219541c639ebd5b435aa3a8d60e139c383dcc6"
           }
         },
         {
-          "client_id": "759557187934-sfsdrhb43cqpirlqdifj54d4sdtt35gf.apps.googleusercontent.com",
+          "client_id": "22636660775-mqkrue0m9u24dfh6hj2f4ioj7vh9accf.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB4oWUNbARUxAcAYJVUo8rwaYoDJusfFmU"
+          "current_key": "AIzaSyC6uWXiguR8E_4T1V4prozP8SYKbC53qIA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "759557187934-sfsdrhb43cqpirlqdifj54d4sdtt35gf.apps.googleusercontent.com",
+              "client_id": "22636660775-mqkrue0m9u24dfh6hj2f4ioj7vh9accf.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

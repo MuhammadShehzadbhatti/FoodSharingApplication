@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -27,12 +28,10 @@ import com.example.foodsharingapplication.authentication.AuthemnticationFragment
 import com.example.foodsharingapplication.authentication.Authentication_Firebase;
 import com.example.foodsharingapplication.model.User;
 import com.example.foodsharingapplication.model.UserUploadFoodModel;
-import com.example.foodsharingapplication.products.FavoritesListView;
 import com.example.foodsharingapplication.products.MessageListActivity;
 import com.example.foodsharingapplication.products.ProductsFragment.ProductGridView;
 import com.example.foodsharingapplication.products.ProductsFragment.ProductListView;
 import com.example.foodsharingapplication.products.ProductsFragment.UploadDataFragment;
-import com.example.foodsharingapplication.products.UserFavoritesFood;
 import com.example.foodsharingapplication.products.UserOrderedFood;
 import com.example.foodsharingapplication.products.UserUploadedFood;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -78,7 +77,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-        //getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new FavoritesListView()).commit();
+        //getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new ProductListView()).commit();
         getLocationPermission();
         getDeviceLocation();
         userData = new User();
@@ -105,67 +104,33 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         txtHeaderEmail = headerView.findViewById(R.id.headerUserEmail);
         txtHeaderName = headerView.findViewById(R.id.headerUserName);
         headerUserProfilePic = headerView.findViewById(R.id.headerUserProfilePic);
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabaseRef = mFirebaseDatabase.getReference("User");
-        /*firebaseAuth.getCurrentUser().getEmail();
-        firebaseAuth.getCurrentUser().getDisplayName();*/
-        /*Log.i("auth.getUserName: ", firebaseAuth.getCurrentUser().getDisplayName());
-        Log.i("auth.getUserEmail: ", firebaseAuth.getCurrentUser().getEmail());*/
-        //firebaseAuth.getCurrentUser().getPhotoUrl();
-        try {
-            if (firebaseAuth.getCurrentUser() != null) {
-                firebaseDatabaseRef.child(firebaseAuth.getCurrentUser().getUid())
-                        .addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                userData = dataSnapshot.getValue(User.class);
-/*                                if (!userData.getUserEmail().isEmpty()) {
-                                    txtHeaderEmail.setText(userData.getUserEmail());
-                                }
+        Log.i("user.id",firebaseAuth.getCurrentUser().getUid());
+        DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference("User").child(firebaseAuth.getCurrentUser().getUid());
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user= dataSnapshot.getValue(User.class);
 
-                                if (!userData.getUserName().isEmpty()) {
-                                    txtHeaderName.setText(userData.getUserName());
-                                }
-                                if (!userData.getUserProfilePicUrl().isEmpty()) {
-                                    Picasso.get().load(userData.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
-                                }
-*/
-                            }
+                if (user.getUserName() != null) {
+                    Log.i("user.getUserName()",user.getUserName());
+                    txtHeaderEmail.setText(user.getUserName());
+                }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-//            firebaseDatabaseRef.child(firebaseAuth.getCurrentUser().getUid())
-//                    .addValueEventListener(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                            userData = dataSnapshot.getValue(User.class);
-//                            if (!userData.getUserEmail().isEmpty()){
-//                                txtHeaderEmail.setText(userData.getUserEmail());
-//                            }
-//
-//                            if (!userData.getUserName().isEmpty()){
-//                                txtHeaderName.setText(userData.getUserName());
-//                            }
-//                            //String profilePicUrl = userData.getUserProfilePicUrl();
-//                           /* Log.i("auth.getUserName: ", userData.getUserName());
-//                            Log.i("auth.getUserEmail: ", firebaseAuth.getCurrentUser().getEmail());*/
-//                            //Picasso.get().load(profilePicUrl).centerCrop().fit().into(headerUserProfilePic);
-//
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                        }
-//                    });
+                if (user.getUserEmail() != null) {
+                    Log.i("user.getUserEmail()",user.getUserEmail());
+                    txtHeaderName.setText(user.getUserEmail());
+                }
+                if (user.getUserProfilePicUrl() != null) {
+                    Log.i("user.getUserPicUrl()",user.getUserProfilePicUrl());
+                    Picasso.get().load(user.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
+                }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         // Navigation Bar Grid View
@@ -190,6 +155,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     case R.id.map:
                         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                         startActivity(intent);
+                        finish();
                         //getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in,R.anim.slide_out).replace(R.id.fragment_container,new MapsFragment()).commit();
 
                         // ///// ADD more cases for different navigation bar options////////
@@ -227,9 +193,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 firebaseDatabaseRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot ds : dataSnapshot.getChildren()){
-                            UserUploadFoodModel userUploadFoodModel= ds.getValue(UserUploadFoodModel.class);
-                            if (querytext.equals(userUploadFoodModel.getFoodTitle())){
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            UserUploadFoodModel userUploadFoodModel = ds.getValue(UserUploadFoodModel.class);
+                            if (querytext.equals(userUploadFoodModel.getFoodTitle())) {
                                 //ProductGridView.getInstance().firebaseSearch(querytext);
                                 UserOrderedFood.getInstance().showSearch(userUploadFoodModel);
                             }
@@ -264,15 +230,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
                     Toast.makeText(HomeActivity.this, "Sign In", Toast.LENGTH_SHORT).show();
                     getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out)
                             .replace(R.id.fragment_container, new ProductGridView()).commit();
-
                 } else {
-
                     intent = new Intent(getApplicationContext(), SignIn.class);
                 }
                 startActivity(intent);
@@ -317,10 +280,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 //nav_bar.setVisibility(View.GONE);
                 //startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
                 break;
-            case R.id.myFav:
-                startActivity(new Intent(HomeActivity.this, UserFavoritesFood.class));
-
-                break;
 
             case R.id.messages:
                 Intent viewMessage = new Intent(HomeActivity.this, MessageListActivity.class);
@@ -337,7 +296,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 break;
             /*case R.id.updateProfile:
                 getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new ProfileHomeFragment()).commit();
-
                 break;*/
         }
 
@@ -378,8 +336,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
-//                            curr = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-//                            Log.e(TAG, "current1" + curr);
+                            curr = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                            Log.e(TAG, "current1" + curr);
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());

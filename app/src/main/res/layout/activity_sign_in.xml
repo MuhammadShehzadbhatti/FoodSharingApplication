@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="10dp"
     android:background="#fff"
     tools:context=".authentication.SignIn">
@@ -33,20 +34,45 @@
         android:layout_marginRight="40dp"
         android:layout_marginLeft="40dp"
         android:id="@+id/logInLayout">
-
-        <EditText
-            android:id="@+id/enterEmail"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputUserEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/enterUserEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:textColor="#A2A19F"
+                android:textColorHighlight="#A2A19F"
+                android:textColorHint="#A2A19F"
+                android:textSize="12sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="Email"
-            android:inputType="text"
-            android:textColorHighlight="#A2A19F"
-            android:textColorHint="#A2A19F"
-            android:textSize="12sp"
-            android:textColor="#A2A19F" />
+            android:layout_below="@+id/inputUserEmail"
+            app:errorEnabled="true"
+            app:passwordToggleEnabled="true">
 
-        <EditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/enterUserLoginPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/enterEmail_SignUp"
+                android:layout_marginTop="10dp"
+                android:ems="10"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:textColor="#A2A19F"
+                android:textColorHighlight="#A2A19F"
+                android:textColorHint="#A2A19F"
+                android:textSize="12sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <!--<EditText
             android:id="@+id/enterLoginPassword"
             android:layout_below="@+id/enterEmail"
             android:layout_width="match_parent"
@@ -57,13 +83,13 @@
             android:textColorHighlight="#A2A19F"
             android:textColorHint="#A2A19F"
             android:textSize="12sp"
-            android:textColor="#A2A19F" />
+            android:textColor="#A2A19F" />-->
 
         <TextView
             android:id="@+id/forgetLoginPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/enterLoginPassword"
+            android:layout_below="@+id/inputPassword"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginTop="10dp"

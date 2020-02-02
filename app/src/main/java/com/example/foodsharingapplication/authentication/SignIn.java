@@ -77,8 +77,8 @@ public class SignIn extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-        email = (EditText) findViewById(R.id.enterEmail);
-        pass = (EditText) findViewById(R.id.enterLoginPassword);
+        email = (EditText) findViewById(R.id.enterUserEmail);
+        pass = (EditText) findViewById(R.id.enterUserLoginPassword);
         txtFbEmail = findViewById(R.id.profile_email);
         txtFbName = findViewById(R.id.enterLoginPassword);
         circleImageView = findViewById(R.id.profile_pic);
@@ -97,14 +97,13 @@ public class SignIn extends AppCompatActivity {
         progress.setMessage("Wait!!");
         progress.setCancelable(true);
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-/*
         forgetPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SignIn.this, com.example.foodsharingapplication.authentication.forgetPassword.class);
                 startActivity(intent);
             }
-        });*/
+        });
 
         userList = new ArrayList<User>();
         verifyUser = new User();

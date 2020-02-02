@@ -1,6 +1,7 @@
 package com.example.foodsharingapplication.authentication;
 
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foodsharingapplication.HomeDefinition;
@@ -61,6 +63,7 @@ public class User_SignUp extends AppCompatActivity {
     private DatabaseReference firebaseDatabaseRef;
     private String firbaseEmail;
     private ArrayList<String> arrayListEmail;
+    private AlertDialog.Builder builder;
 
 
     @Override
@@ -74,12 +77,13 @@ public class User_SignUp extends AppCompatActivity {
         txtUser_Password = findViewById(R.id.enterPassword_SignUp);
         txtUser_ConfirmPassword = findViewById(R.id.confirmPassword_SignUp);
         btnUser_ChooseImage = findViewById(R.id.btnChoose_SignUp);
-        btnUser_UploadImage = findViewById(R.id.btnUpload_SignUp);
         btnUser_SignUp = findViewById(R.id.btnSignup_SignUp);
-        imgUser_ProfileImage = findViewById(R.id.profileImgView_SignUp);
         logoImg_SignUp = findViewById(R.id.logoImg_SignUp);
         txtGo_ToLogin = findViewById(R.id.txtSignIn_SignUp);
         arrayListEmail = new ArrayList<>();
+
+        builder = new AlertDialog.Builder(this);
+
         userData = new User();
         authentication_firebase = new Authentication_Firebase(getApplicationContext());
         firebaseStorageReference = FirebaseStorage.getInstance().getReference("User");
@@ -91,19 +95,13 @@ public class User_SignUp extends AppCompatActivity {
                 chooseImage();
             }
         });
-        /*btnUser_UploadImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uploadImage();
-            }
-        });*/
 
         txtGo_ToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(User_SignUp.this, SignIn.class);
                 startActivity(intent);
-                finish();
+                //finish();
             }
         });
 
@@ -113,6 +111,32 @@ public class User_SignUp extends AppCompatActivity {
                 RegisterUser();
             }
         });
+    }
+
+    private void checkEmailDialogue() {
+        //Uncomment the below code to Set the message and title from the strings.xml file
+        builder.setMessage("Check Your email") .setTitle("Email Verification ");
+
+        //Setting message manually and performing action on button click
+        builder.setMessage("You received an email please click on the attacked link to verify the email address ")
+                .setCancelable(false)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(getApplicationContext(),SignIn.class));
+                        //finish();
+                    }
+                });
+        //Creating dialog box
+        AlertDialog alert = builder.create();
+        //Setting the title manually
+        alert.setTitle("Email Verification Alert:");
+        alert.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(getApplicationContext(), SignIn.class));
+        finish();
     }
 
     private void RegisterUser() {
@@ -211,15 +235,16 @@ public class User_SignUp extends AppCompatActivity {
                                                                             if (task.isSuccessful()) {
                                                                                 if (firebaseAuth.getCurrentUser().isEmailVerified()) {
                                                                                     startActivity(new Intent(User_SignUp.this, HomeDefinition.class));
-                                                                                    finish();
+                                                                                    //finish();
                                                                                 } else {
                                                                                     firebaseAuth.signOut();
                                                                                     startActivity(new Intent(User_SignUp.this, HomeDefinition.class));
-                                                                                    finish();
+                                                                                    checkEmailDialogue();
+                                                                                    //finish();
                                                                                 }
                                                                                 toastMessage("Check your email for verification");
                                                                                 startActivity(new Intent(User_SignUp.this, HomeDefinition.class));
-                                                                                finish();
+                                                                                //finish();
                                                                             } else {
                                                                                 toastMessage("Enter a valid email");
                                                                             }
@@ -235,7 +260,7 @@ public class User_SignUp extends AppCompatActivity {
                                     }
                                 } else {
                                     //do on failure
-                                    Toast.makeText(User_SignUp.this, "Email Already Exists", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(User_SignUp.this, "Email Already Exists12", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -243,9 +268,6 @@ public class User_SignUp extends AppCompatActivity {
 
             } else {
                 Toast.makeText(this, "Email or Password can't be empty", Toast.LENGTH_SHORT).show();
-            }
-            if (!userData.getUserProfilePicUrl().isEmpty()){
-
             }
         } catch (NullPointerException e) {
             Toast.makeText(User_SignUp.this, "Email already exists!", Toast.LENGTH_SHORT).show();
@@ -272,7 +294,6 @@ public class User_SignUp extends AppCompatActivity {
                     filePath = data.getData();
                     Picasso.get().load(filePath).centerCrop().resize(90, 90).into(logoImg_SignUp);
                     uploadImage();
-                    btnUser_UploadImage.setVisibility(View.GONE);
                 }
                 break;
             case 1:
@@ -280,7 +301,6 @@ public class User_SignUp extends AppCompatActivity {
                     filePath = data.getData();
                     Picasso.get().load(filePath).centerCrop().resize(90, 90).into(logoImg_SignUp);
                     uploadImage();
-                    btnUser_UploadImage.setVisibility(View.VISIBLE);
                     btnUser_ChooseImage.setVisibility(View.GONE);
                 }
                 break;
