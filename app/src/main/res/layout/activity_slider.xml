@@ -30,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="15dp"
+                android:textColor="@color/colorAdText"
                 android:textSize="20dp"
                 android:textStyle="bold"
                 android:text="Latest"/>
@@ -42,15 +43,31 @@
                 android:layout_weight="1"
                 android:layout_marginTop="2dp"
                 android:orientation="horizontal" />
+            <View
+                android:id="@+id/SplitLine_hor"
+                android:layout_width="match_parent"
+                android:layout_height= "5dp"
+                android:background="#ADADAD" />
+            <View
+                android:id="@+id/SplitLine_hor1"
+                android:layout_width="match_parent"
+                android:layout_height= "3dp"
+                android:background="#A8A7A7" />
+            <View
+                android:id="@+id/SplitLine_hor2"
+                android:layout_width="match_parent"
+                android:layout_height= "5dp"
+                android:background="#ADADAD" />
 
             <TextView
                 android:id="@+id/tag2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginLeft="15dp"
                 android:textSize="20dp"
                 android:textStyle="bold"
+                android:textColor="@color/colorAdText"
                 android:text="Nearest"/>
 
 

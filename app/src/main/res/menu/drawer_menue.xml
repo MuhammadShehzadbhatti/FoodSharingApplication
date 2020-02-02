@@ -34,6 +34,10 @@
                 android:id="@+id/myAds"
                 android:title="My Ads"
                 android:icon="@drawable/ic_message_black_24dp" />
+            <item
+                android:id="@+id/myFav"
+                android:title="My Favorites"
+                android:icon="@drawable/ic_message_black_24dp" />
 
         </menu>
 

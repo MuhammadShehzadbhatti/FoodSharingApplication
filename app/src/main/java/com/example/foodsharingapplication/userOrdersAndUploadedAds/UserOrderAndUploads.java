@@ -52,6 +52,7 @@ public class UserOrderAndUploads extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slider);
         recyclerView = findViewById(R.id.slider_recycler_view);
+//        ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         //ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         tag1 = findViewById(R.id.tag1);
         tag2 = findViewById(R.id.tag2);

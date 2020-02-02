@@ -110,7 +110,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user= dataSnapshot.getValue(User.class);
-
                     if (user.getUserName() != null) {
                         Log.i("user.getUserName()",user.getUserName());
                         txtHeaderEmail.setText(user.getUserName());
@@ -124,6 +123,19 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         Log.i("user.getUserPicUrl()",user.getUserProfilePicUrl());
                         Picasso.get().load(user.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
                     }
+                if (user.getUserName() != null) {
+                    Log.i("user.getUserName()",user.getUserName());
+                    txtHeaderEmail.setText(user.getUserName());
+                }
+
+                if (user.getUserEmail() != null) {
+                    Log.i("user.getUserEmail()",user.getUserEmail());
+                    txtHeaderName.setText(user.getUserEmail());
+                }
+                if (user.getUserProfilePicUrl() != null) {
+                    Log.i("user.getUserPicUrl()",user.getUserProfilePicUrl());
+                    Picasso.get().load(user.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
+                }
             }
 
             @Override
@@ -187,34 +199,17 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                String srchTxt = newText.substring(0, 1).toUpperCase();
-                final String querytext = srchTxt + newText.substring(1);
+                //String srchTxt = newText.substring(0, 1).toUpperCase();
+                String querytext = newText.substring(0, 1).toUpperCase() + newText.substring(1);
                 ProductGridView.getInstance().firebaseSearch(querytext);
-                firebaseDatabaseRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            UserUploadFoodModel userUploadFoodModel = ds.getValue(UserUploadFoodModel.class);
-                            if (querytext.equals(userUploadFoodModel.getFoodTitle())) {
-                                //ProductGridView.getInstance().firebaseSearch(querytext);
-                                UserOrderedFood.getInstance().showSearch(userUploadFoodModel);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-                return true;
+                return false;
             }
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                /*String s1 = query.substring(0, 1).toUpperCase();
+                String s1 = query.substring(0, 1).toUpperCase();
                 String nameCapitalized = s1 + query.substring(1);
-                ProductGridView.getInstance().firebaseSearch(nameCapitalized);*/
+                ProductGridView.getInstance().firebaseSearch(nameCapitalized);
 
                 return false;
             }
@@ -230,15 +225,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
                     Toast.makeText(HomeActivity.this, "Sign In", Toast.LENGTH_SHORT).show();
                     getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out)
                             .replace(R.id.fragment_container, new ProductGridView()).commit();
-
                 } else {
-
                     intent = new Intent(getApplicationContext(), SignIn.class);
                 }
                 startActivity(intent);
@@ -299,7 +291,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 break;
             /*case R.id.updateProfile:
                 getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new ProfileHomeFragment()).commit();
-
                 break;*/
         }
 

@@ -147,13 +147,13 @@ public class PostDetailActivity extends AppCompatActivity {
 
         if (imageUri != null) {
             ImageView imageV = new ImageView(PostDetailActivity.this);
-            Picasso.get().load(imageUri).into(imageV);
+            Picasso.get().load(imageUri).fit().into(imageV);
             pFlip.addView(imageV);
         } else if (!imageArray.isEmpty()) {
             for (int i = 0; i < imageArray.size(); i++) {
                 String uri = imageArray.get(i);
                 ImageView imageV = new ImageView(PostDetailActivity.this);
-                Picasso.get().load(uri).into(imageV);
+                Picasso.get().load(uri).fit().into(imageV);
                 pFlip.addView(imageV);
             }
             Animation out = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);

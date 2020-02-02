@@ -1,5 +1,4 @@
-package com.example.foodsharingapplication.products.ProductsFragment;
-
+package com.example.foodsharingapplication.products;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,22 +7,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodsharingapplication.R;
 import com.example.foodsharingapplication.model.User;
 import com.example.foodsharingapplication.model.UserUploadFoodModel;
-import com.example.foodsharingapplication.products.PostDetailActivity;
-import com.example.foodsharingapplication.products.ViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.firebase.ui.database.ObservableSnapshotArray;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -33,11 +31,9 @@ import com.google.firebase.database.Query;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class ProductListView extends Fragment {
+public class FavoritesListView extends AppCompatActivity {
 
+    FirebaseAuth firebaseAuth;
     FirebaseAuth.AuthStateListener firebaseAuthListener;
     BottomNavigationView nav_bar;
     RecyclerView mRecyclerView;
@@ -47,39 +43,33 @@ public class ProductListView extends Fragment {
     FirebaseAuth mFirebaseAuth;
     private DrawerLayout drawerLayout;
 
-    public ProductListView() {
-        // Required empty public constructor
-    }
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        setHasOptionsMenu(true);
-        View view = inflater.inflate(R.layout.activity_home, container, false);
-
-        //Copied Code Start
-
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseAuth.getCurrentUser();
-        /*if (!mFirebaseAuth.getCurrentUser().equals(null)) {
+        if (!mFirebaseAuth.getCurrentUser().equals(null)) {
 
-        }*/
+        }
         // ////////Action Bar////////////
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Today's Menu");*/
-        mRecyclerView = view.findViewById(R.id.my_recycler_view);
+        mRecyclerView = findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        mLL = new LinearLayoutManager(getContext());
+        mLL = new LinearLayoutManager(this);
+
+        // ///// Set Latest First ////////////
+        mLL.setReverseLayout(true);
+        mLL.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(mLL);
 
-        return view;
-    }
+
+    } // onCreate ends here
 
 
     @Override
-    public void onStart() {
+    protected void onStart() {
         super.onStart();
 
         // ///////////Query to get Data from Firebase and Populate HomePage///////////
@@ -93,13 +83,7 @@ public class ProductListView extends Fragment {
 
             @Override
             protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull UserUploadFoodModel model) {
-
-                if(model.getmImageUri()!=null) {
-                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
-                }
-                else {
-                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmArrayString().get(0), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
-                }
+                holder.setDetails(getApplicationContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser().getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
             }
 
             @NonNull
@@ -121,14 +105,14 @@ public class ProductListView extends Fragment {
                         String myType = getItem(position).getFoodType();
                         String myCuisineType = getItem(position).getFoodTypeCuisine();
                         String pay = getItem(position).getPayment();
-                        User foodPostedBy = getItem(position).getFoodPostedBy();
                         String available = getItem(position).getAvailabilityDays();
-                        String mImageUri = getItem(position).getmImageUri();
+                        User foodPostedBy = getItem(position).getFoodPostedBy();
                         ArrayList<String> imageArray = getItem(position).getmArrayString();
+
 
                         Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
 
-                        intent.putExtra("ad_id", ad_id);
+                        intent.putExtra("ad_id",ad_id);
                         intent.putExtra("title", myTitle);
                         intent.putExtra("description", myDesc);
                         intent.putExtra("price", myPrice);
@@ -137,13 +121,10 @@ public class ProductListView extends Fragment {
                         intent.putExtra("cuisineType", myCuisineType);
                         intent.putExtra("pay", pay);
                         intent.putExtra("availability", available);
+                        intent.putExtra("foodPostedBy",foodPostedBy);
 
-                        if(mImageUri!=null){
-                            intent.putExtra("imageUri", mImageUri);
-                        }
-                        else{
-                            intent.putStringArrayListExtra("imageArray",imageArray);
-                        }
+                        // Image Setting
+                        intent.putExtra("imageArray", imageArray);
 
                         startActivity(intent);
                     }
@@ -161,6 +142,20 @@ public class ProductListView extends Fragment {
         mRecyclerView.setAdapter(firebaseRecyclerAdapter);
 
 
+    }
+
+
+    //navigation drawer start
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+
+            super.onBackPressed();
+
+        }
     }
 
 }

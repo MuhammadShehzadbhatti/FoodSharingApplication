@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -37,6 +38,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.paypal.android.sdk.payments.LoginActivity;
 import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
@@ -215,12 +217,12 @@ public class User_SignUp extends AppCompatActivity {
         }
         try {
             if (!txtUser_Email.getText().toString().isEmpty() && !txtUser_Password.getText().toString().isEmpty()) {
-
                 firebaseAuth.createUserWithEmailAndPassword(txtUser_Email.getText().toString(), txtUser_Password.getText().toString().trim())
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
+                                    Log.i("name and pass:",txtUser_Email.getText().toString()+"  "+txtUser_Password.getText().toString());
                                     userData.setUserId(firebaseAuth.getCurrentUser().getUid());
                                     if (!userData.getUserName().isEmpty()) {
                                         firebaseDatabaseRef.child(userData.getUserId()).setValue(userData)
@@ -260,7 +262,11 @@ public class User_SignUp extends AppCompatActivity {
                                     }
                                 } else {
                                     //do on failure
-                                    Toast.makeText(User_SignUp.this, "Email Already Exists", Toast.LENGTH_SHORT).show();
+                                    FirebaseAuthException e = (FirebaseAuthException )task.getException();
+                                    Toast.makeText(User_SignUp.this, "Failed Registration: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Log.i("Failed Registration: ",e.getMessage());
+                                    //message.hide();
+                                    return;
                                 }
                             }
                         });
