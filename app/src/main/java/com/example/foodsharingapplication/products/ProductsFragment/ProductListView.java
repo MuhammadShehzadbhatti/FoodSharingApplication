@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.foodsharingapplication.Adapters.UserUploadedFoodAdapter;
 import com.example.foodsharingapplication.R;
 import com.example.foodsharingapplication.model.User;
 import com.example.foodsharingapplication.model.UserUploadFoodModel;
@@ -32,6 +33,7 @@ import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,7 +48,8 @@ public class ProductListView extends Fragment {
     LinearLayoutManager mLL;
     FirebaseAuth mFirebaseAuth;
     private DrawerLayout drawerLayout;
-
+    private static ProductListView productListView;
+    private UserUploadedFoodAdapter userUploadedFoodAdapter;
     public ProductListView() {
         // Required empty public constructor
     }
@@ -77,7 +80,9 @@ public class ProductListView extends Fragment {
         return view;
     }
 
-
+    public static ProductListView getInstance(){
+        return productListView;
+    }
     @Override
     public void onStart() {
         super.onStart();

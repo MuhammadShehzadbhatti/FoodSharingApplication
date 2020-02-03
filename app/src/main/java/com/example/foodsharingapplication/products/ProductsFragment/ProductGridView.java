@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodsharingapplication.Adapters.NearestAdapter;
+import com.example.foodsharingapplication.Adapters.UserUploadedFoodAdapter;
 import com.example.foodsharingapplication.R;
 import com.example.foodsharingapplication.extras.AllProducts;
 import com.example.foodsharingapplication.model.User;
@@ -56,6 +57,7 @@ public class ProductGridView extends Fragment implements NearestAdapter.ItemClic
     FirebaseAuth firebaseAuth;
     private static ProductGridView productGridView;
 
+    private UserUploadedFoodAdapter userUploadedFoodAdapter;
     NearestAdapter nearestAdapter;
     UserUploadFoodModel userUploadFoodModel;
 
@@ -93,10 +95,10 @@ public class ProductGridView extends Fragment implements NearestAdapter.ItemClic
         myRecyclerView2.setHasFixedSize(true);
 
 
-        sRecyclerView = view.findViewById(R.id.search_recycler_view);
-        sRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager LL = new LinearLayoutManager(getContext());
-        sRecyclerView.setLayoutManager(LL);
+       // sRecyclerView = view.findViewById(R.id.search_recycler_view);
+//        sRecyclerView.setHasFixedSize(true);
+        //LinearLayoutManager LL = new LinearLayoutManager(getContext());
+        //sRecyclerView.setLayoutManager(LL);
 
 
         // ////////Make it Horizontal/////////////
@@ -122,93 +124,13 @@ public class ProductGridView extends Fragment implements NearestAdapter.ItemClic
 
 
 
+    public void searchGridResults(List<UserUploadFoodModel> userUploadFoodModels){
 
-    // /////////Search View Query and Populating View//////////
-    public void firebaseSearch(String searchText) {
-        slider_linear_layout.setVisibility(View.GONE);
-        String query = searchText;
-        Query searchQuery = FirebaseDatabase.getInstance().getReference("Food").child("FoodByAllUsers").orderByChild("foodTitle").startAt(query).endAt(query + "\uf0ff");
+         userUploadedFoodAdapter = new UserUploadedFoodAdapter(getContext(),userUploadFoodModels);
+         sRecyclerView.setAdapter(userUploadedFoodAdapter);
 
-        FirebaseRecyclerOptions<UserUploadFoodModel> searchOptions =
-                new FirebaseRecyclerOptions.Builder<UserUploadFoodModel>().setQuery(searchQuery, UserUploadFoodModel.class).build();
-
-        FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder>(searchOptions) {
-            @Override
-            protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull UserUploadFoodModel model) {
-                if(model.getmImageUri()!=null) {
-                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser()
-                            .getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
-                }
-                else{
-                    holder.setDetails(getContext(), model.getFoodTitle(), model.getmArrayString().get(0), model.getUser()
-                            .getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
-                }
-            }
-
-            @NonNull
-            @Override
-            public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View viewSearch = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_view, parent, false);
-                ViewHolder viewHolderS = new ViewHolder(viewSearch);
-
-                // ///////On click handled for Search View to Detail Page/////////////////
-                viewHolderS.setOnClickListener(new ViewHolder.ClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-
-
-                        String ad_id = getItem(position).getAdId();
-                        String myTitle = getItem(position).getFoodTitle();
-                        String myDesc = getItem(position).getFoodDescription();
-                        String myPrice = getItem(position).getFoodPrice();
-                        String myTime = getItem(position).getFoodPickUpDetail();
-                        String myType = getItem(position).getFoodType();
-                        String myCuisineType = getItem(position).getFoodTypeCuisine();
-                        String pay = getItem(position).getPayment();
-                        String available = getItem(position).getAvailabilityDays();
-                        User foodPostedBy = getItem(position).getFoodPostedBy();
-                        String mImageUri = getItem(position).getmImageUri();
-                        ArrayList<String> imageArray = getItem(position).getmArrayString();
-
-
-
-                        Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
-
-                        intent.putExtra("ad_id",ad_id);
-                        intent.putExtra("title", myTitle);
-                        intent.putExtra("description", myDesc);
-                        intent.putExtra("price", myPrice);
-                        intent.putExtra("time", myTime);
-                        intent.putExtra("type", myType);
-                        intent.putExtra("cuisineType", myCuisineType);
-                        intent.putExtra("pay", pay);
-                        intent.putExtra("foodPostedBy",foodPostedBy);
-                        intent.putExtra("availability", available);
-
-                        if(mImageUri!=null){
-                            intent.putExtra("imageUri", mImageUri);
-                        }
-                        else{
-                            intent.putStringArrayListExtra("imageArray",imageArray);
-                        }
-
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onItemLongClick(View view, int position) {
-
-                    }
-                });
-
-
-                return viewHolderS;
-            }
-        };
-        firebaseRecyclerAdapter.startListening();
-        sRecyclerView.setAdapter(firebaseRecyclerAdapter);
-        // ///////Search View ends here/////////
     }
+
     // firebase Search ends here
 
     // ///////// Inflating View for Search Bar /////////

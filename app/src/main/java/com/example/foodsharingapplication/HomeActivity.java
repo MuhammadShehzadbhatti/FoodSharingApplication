@@ -5,13 +5,15 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -22,6 +24,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodsharingapplication.Maps.MapsActivity;
 import com.example.foodsharingapplication.authentication.AuthemnticationFragments.ProfileHomeFragment;
@@ -29,11 +33,15 @@ import com.example.foodsharingapplication.authentication.Authentication_Firebase
 import com.example.foodsharingapplication.model.User;
 import com.example.foodsharingapplication.model.UserUploadFoodModel;
 import com.example.foodsharingapplication.products.MessageListActivity;
+import com.example.foodsharingapplication.products.PostDetailActivity;
 import com.example.foodsharingapplication.products.ProductsFragment.ProductGridView;
 import com.example.foodsharingapplication.products.ProductsFragment.ProductListView;
 import com.example.foodsharingapplication.products.ProductsFragment.UploadDataFragment;
 import com.example.foodsharingapplication.products.UserOrderedFood;
 import com.example.foodsharingapplication.products.UserUploadedFood;
+import com.example.foodsharingapplication.products.ViewHolder;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -46,8 +54,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -70,12 +82,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private DatabaseReference firebaseDatabaseRef;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Location mLastKnownLocation;
-
+    private List<UserUploadFoodModel> userSearchList;
+    private RecyclerView recyclerView;
+    private FrameLayout frameLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        recyclerView = findViewById(R.id.search_recycler_view);
+        frameLayout = findViewById(R.id.fragment_container);
+        // sRecyclerView = view.findViewById(R.id.search_recycler_view);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager LL = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(LL);
         //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         //getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new ProductListView()).commit();
         getLocationPermission();
@@ -91,7 +111,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         //Toolbar searchToolbar = findViewById(R.id.searchToolbar);
         drawerLayout = findViewById(R.id.drawer_layout);
 
-
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.navigationDrawerOpen, R.string.navigationDrawerClose);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -104,36 +123,37 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         txtHeaderEmail = headerView.findViewById(R.id.headerUserEmail);
         txtHeaderName = headerView.findViewById(R.id.headerUserName);
         headerUserProfilePic = headerView.findViewById(R.id.headerUserProfilePic);
-        Log.i("user.id",firebaseAuth.getCurrentUser().getUid());
-        DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference("User").child(firebaseAuth.getCurrentUser().getUid());
+        Log.i("user.id", firebaseAuth.getCurrentUser().getUid());
+        firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference("Food").child("FoodByAllUsers");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("User").child(firebaseAuth.getCurrentUser().getUid());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user= dataSnapshot.getValue(User.class);
-                    if (user.getUserName() != null) {
-                        Log.i("user.getUserName()",user.getUserName());
-                        txtHeaderEmail.setText(user.getUserName());
-                    }
-
-                    if (user.getUserEmail() != null) {
-                        Log.i("user.getUserEmail()",user.getUserEmail());
-                        txtHeaderName.setText(user.getUserEmail());
-                    }
-                    if (user.getUserProfilePicUrl() != null) {
-                        Log.i("user.getUserPicUrl()",user.getUserProfilePicUrl());
-                        Picasso.get().load(user.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
-                    }
+                User user = dataSnapshot.getValue(User.class);
                 if (user.getUserName() != null) {
-                    Log.i("user.getUserName()",user.getUserName());
+                    Log.i("user.getUserName()", user.getUserName());
                     txtHeaderEmail.setText(user.getUserName());
                 }
 
                 if (user.getUserEmail() != null) {
-                    Log.i("user.getUserEmail()",user.getUserEmail());
+                    Log.i("user.getUserEmail()", user.getUserEmail());
                     txtHeaderName.setText(user.getUserEmail());
                 }
                 if (user.getUserProfilePicUrl() != null) {
-                    Log.i("user.getUserPicUrl()",user.getUserProfilePicUrl());
+                    Log.i("user.getUserPicUrl()", user.getUserProfilePicUrl());
+                    Picasso.get().load(user.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
+                }
+                if (user.getUserName() != null) {
+                    Log.i("user.getUserName()", user.getUserName());
+                    txtHeaderEmail.setText(user.getUserName());
+                }
+
+                if (user.getUserEmail() != null) {
+                    Log.i("user.getUserEmail()", user.getUserEmail());
+                    txtHeaderName.setText(user.getUserEmail());
+                }
+                if (user.getUserProfilePicUrl() != null) {
+                    Log.i("user.getUserPicUrl()", user.getUserProfilePicUrl());
                     Picasso.get().load(user.getUserProfilePicUrl()).centerCrop().fit().into(headerUserProfilePic);
                 }
             }
@@ -154,6 +174,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     case R.id.grid:
                         //Fragment Animation add where calling new fragment using fallowing function after transaction
                         //.setCustomAnimations(R.anim.slide_in,R.anim.slide_out)
+
                         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in, R.anim.slide_out).replace(R.id.fragment_container, new ProductGridView()).commit();
                         return true;
 
@@ -198,10 +219,31 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             // ////////// Functions for Searching ///////////
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                //String srchTxt = newText.substring(0, 1).toUpperCase();
-                String querytext = newText.substring(0, 1).toUpperCase() + newText.substring(1);
-                ProductGridView.getInstance().firebaseSearch(querytext);
+            public boolean onQueryTextChange(final String newText) {
+               /* String srchTxt = newText.substring(0, 1).toUpperCase();
+                final String querytext = srchTxt + newText.substring(1);*/
+                //ProductGridView.getInstance().firebaseSearch(querytext);
+                /*firebaseDatabaseRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                            Log.i("datasnapshot: ",ds.toString());
+                            UserUploadFoodModel userUploadFoodModel = ds.getValue(UserUploadFoodModel.class);
+                            if (newText.toLowerCase().equals(userUploadFoodModel.getFoodTitle().toLowerCase())) {
+                                userSearchList.add(userUploadFoodModel);
+                                ProductGridView.getInstance().searchGridResults(userSearchList);
+                                *//*ProductListView.getInstance().searchListResults(userSearchList);*//*
+                                // UserOrderedFood.getInstance().showSearch(userUploadFoodModel);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });*/
                 return false;
             }
 
@@ -209,13 +251,100 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             public boolean onQueryTextSubmit(String query) {
                 String s1 = query.substring(0, 1).toUpperCase();
                 String nameCapitalized = s1 + query.substring(1);
-                ProductGridView.getInstance().firebaseSearch(nameCapitalized);
+                //ProductGridView.getInstance().firebaseSearch(nameCapitalized);
+                firebaseSearch(nameCapitalized);
+
+                //ProductListView.getInstance().firebaseSearch(nameCapitalized);
 
                 return false;
             }
 
         });
         return true;
+    }
+
+    // /////////Search View Query and Populating View//////////
+    public void firebaseSearch(String searchText) {
+        //slider_linear_layout.setVisibility(View.GONE);
+        String query = searchText;
+        Query searchQuery = FirebaseDatabase.getInstance().getReference("Food").child("FoodByAllUsers").orderByChild("foodTitle").startAt(query).endAt(query + "\uf0ff");
+        frameLayout.setVisibility(View.GONE);
+        FirebaseRecyclerOptions<UserUploadFoodModel> searchOptions =
+                new FirebaseRecyclerOptions.Builder<UserUploadFoodModel>().setQuery(searchQuery, UserUploadFoodModel.class).build();
+
+        FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<UserUploadFoodModel, ViewHolder>(searchOptions) {
+            @Override
+            protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull UserUploadFoodModel model) {
+                if (model.getmImageUri() != null) {
+                    holder.setDetails(getApplicationContext(), model.getFoodTitle(), model.getmImageUri(), model.getUser()
+                            .getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                } else {
+                    holder.setDetails(getApplicationContext(), model.getFoodTitle(), model.getmArrayString().get(0), model.getUser()
+                            .getUserProfilePicUrl(), model.getFoodPrice(), model.getFoodPickUpDetail());
+                }
+            }
+
+            @NonNull
+            @Override
+            public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View viewSearch = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_view, parent, false);
+                ViewHolder viewHolderS = new ViewHolder(viewSearch);
+
+                // ///////On click handled for Search View to Detail Page/////////////////
+                viewHolderS.setOnClickListener(new ViewHolder.ClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+
+
+                        String ad_id = getItem(position).getAdId();
+                        String myTitle = getItem(position).getFoodTitle();
+                        String myDesc = getItem(position).getFoodDescription();
+                        String myPrice = getItem(position).getFoodPrice();
+                        String myTime = getItem(position).getFoodPickUpDetail();
+                        String myType = getItem(position).getFoodType();
+                        String myCuisineType = getItem(position).getFoodTypeCuisine();
+                        String pay = getItem(position).getPayment();
+                        String available = getItem(position).getAvailabilityDays();
+                        User foodPostedBy = getItem(position).getFoodPostedBy();
+                        String mImageUri = getItem(position).getmImageUri();
+                        ArrayList<String> imageArray = getItem(position).getmArrayString();
+
+
+                        Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
+
+                        intent.putExtra("ad_id", ad_id);
+                        intent.putExtra("title", myTitle);
+                        intent.putExtra("description", myDesc);
+                        intent.putExtra("price", myPrice);
+                        intent.putExtra("time", myTime);
+                        intent.putExtra("type", myType);
+                        intent.putExtra("cuisineType", myCuisineType);
+                        intent.putExtra("pay", pay);
+                        intent.putExtra("foodPostedBy", foodPostedBy);
+                        intent.putExtra("availability", available);
+
+                        if (mImageUri != null) {
+                            intent.putExtra("imageUri", mImageUri);
+                        } else {
+                            intent.putStringArrayListExtra("imageArray", imageArray);
+                        }
+
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+
+                    }
+                });
+
+
+                return viewHolderS;
+            }
+        };
+        firebaseRecyclerAdapter.startListening();
+        recyclerView.setAdapter(firebaseRecyclerAdapter);
+        // ///////Search View ends here/////////
     }
 
     @Override
